@@ -266,6 +266,65 @@
           <!-- JS填充 -->
         </div>
       </div>
+
+      <!-- 第三部分: 对码映射 -->
+      <div class="mt-8">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">🔢 对码映射（05-16-27-38-49）</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">输入上期开奖号码，自动映射对码组合</h4>
+            <input type="text" id="duima-input" placeholder="如: 661" maxlength="3" class="w-full px-4 py-3 rounded-lg text-lg text-center tracking-[0.5em] font-bold mb-4">
+            <button onclick="predictDuima()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">对码映射</button>
+            <div id="duima-result" class="mt-4 hidden">
+              <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">开奖号</span>
+                  <span id="duima-num" class="font-mono font-bold text-white text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">匹配对码</span>
+                  <span id="duima-key" class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg font-bold font-mono"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">胆组</span>
+                  <span id="duima-danzu" class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg font-bold font-mono"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">对码</span>
+                  <div class="flex gap-2">
+                    <span id="duima-d1" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg font-bold font-mono"></span>
+                    <span id="duima-d2" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg font-bold font-mono"></span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <div class="text-xs text-red-400 mb-1">❌ 不组条件（余偶）</div>
+                  <span id="duima-yuou" class="font-mono font-bold text-red-400 text-lg tracking-widest"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">对码映射表</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="text-slate-500 text-xs">
+                  <tr>
+                    <th class="text-left py-2">对码</th>
+                    <th class="text-center">胆组</th>
+                    <th class="text-center">对码</th>
+                    <th class="text-center">对码</th>
+                    <th class="text-center text-red-400">余偶(不组)</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-300" id="duima-table">
+                  <!-- JS填充 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 模块4: 万能七码 -->
@@ -690,6 +749,21 @@ const WAN_NENG = [
   { name: '组合6', pairs: ['36','38','68'] }
 ];
 
+// 对码映射表 (05-16-27-38-49)
+const DUIMA_MAP = {
+  '05': { danzu: '349', duima1: '05', duima2: '16', yuou: '278' },
+  '16': { danzu: '279', duima1: '16', duima2: '05', yuou: '348' },
+  '27': { danzu: '168', duima1: '27', duima2: '05', yuou: '349' },
+  '38': { danzu: '279', duima1: '38', duima2: '05', yuou: '146' },
+  '49': { danzu: '138', duima1: '49', duima2: '05', yuou: '267' }
+};
+
+// 对码转换: 0↔5, 1↔6, 2↔7, 3↔8, 4↔9
+function getDuimaPair(digit) {
+  const pairMap = { '0':'05', '5':'05', '1':'16', '6':'16', '2':'27', '7':'27', '3':'38', '8':'38', '4':'49', '9':'49' };
+  return pairMap[String(digit)];
+}
+
 // 9条规则定义
 const RULES = [
   { id: 1, name: '百位定后两位', cond: (b,s,g) => b===6 && [50,51,53].includes(s*10+g), result: '未来1-3期关注特定后两位' },
@@ -903,6 +977,57 @@ function analyzeTrend() {
 function classifyName(str) {
   const c = classify(str);
   return c==='z6'?'组六':c==='z3'?'组三':'豹子';
+}
+
+// ==================== 对码映射 ====================
+
+function initDuimaTable() {
+  const tbody = document.getElementById('duima-table');
+  tbody.innerHTML = Object.entries(DUIMA_MAP).map(([key, val]) => `
+    <tr class="border-b border-slate-800">
+      <td class="py-2 font-mono font-bold text-purple-400">${key}</td>
+      <td class="text-center font-mono text-blue-400">${val.danzu}</td>
+      <td class="text-center font-mono text-green-400">${val.duima1}</td>
+      <td class="text-center font-mono text-green-400">${val.duima2}</td>
+      <td class="text-center font-mono font-bold text-red-400">${val.yuou}</td>
+    </tr>
+  `).join('');
+}
+
+function predictDuima() {
+  const val = document.getElementById('duima-input').value.trim();
+  if (!val || val.length < 3) { alert('请输入3位开奖号码'); return; }
+  const ns = pad3(val);
+  const digits = [ns[0], ns[1], ns[2]];
+
+  // 找出开奖号中所有数字对应的对码组
+  const pairsFound = new Set();
+  digits.forEach(d => pairsFound.add(getDuimaPair(d)));
+  const pairs = [...pairsFound];
+
+  const resultDiv = document.getElementById('duima-result');
+  resultDiv.classList.remove('hidden');
+
+  // 如果只有一个对码组，直接显示
+  // 如果有多个，优先显示包含开奖号数字最多的那个
+  let bestPair = pairs[0];
+  if (pairs.length > 1) {
+    // 检查是否有对子（如66）→ 选对应的对码
+    const digitCounts = {};
+    digits.forEach(d => digitCounts[d] = (digitCounts[d] || 0) + 1);
+    const hasDuizi = Object.entries(digitCounts).find(([d, c]) => c >= 2);
+    if (hasDuizi) {
+      bestPair = getDuimaPair(hasDuizi[0]);
+    }
+  }
+
+  const map = DUIMA_MAP[bestPair];
+  document.getElementById('duima-num').textContent = ns;
+  document.getElementById('duima-key').textContent = bestPair;
+  document.getElementById('duima-danzu').textContent = map.danzu;
+  document.getElementById('duima-d1').textContent = map.duima1;
+  document.getElementById('duima-d2').textContent = map.duima2;
+  document.getElementById('duima-yuou').textContent = map.yuou;
 }
 
 // ==================== 模块3: 胆码预测 ====================
@@ -1796,12 +1921,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化万能组合
   initWanneng();
 
+  // 初始化对码映射表
+  initDuimaTable();
+
   // 初始化规则统计面板
   renderRuleStats();
   initRuleEditor();
 
   // 输入框回车触发
   document.getElementById('dan-input')?.addEventListener('keypress', e => { if(e.key==='Enter') predictDan(); });
+  document.getElementById('duima-input')?.addEventListener('keypress', e => { if(e.key==='Enter') predictDuima(); });
   document.getElementById('seven-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchSeven(); });
   document.getElementById('wn-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchWanneng(); });
   document.getElementById('span-input')?.addEventListener('keypress', e => { if(e.key==='Enter') analyzeSpan(); });
