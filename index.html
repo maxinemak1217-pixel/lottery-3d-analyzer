@@ -53,10 +53,10 @@
     .trend-down { color: #4ade80; }
   </style>
 </head>
-<body class="min-h-screen flex overflow-hidden">
+<body class="h-screen overflow-hidden">
 
   <!-- 左侧导航 -->
-  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+  <aside class="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-50">
     <div class="p-6 border-b border-slate-800">
       <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">🔮 预测分析平台</h1>
       <p class="text-xs text-slate-500 mt-1">智能号码走势分析系统</p>
@@ -68,20 +68,20 @@
       <button onclick="switchPanel('trend')" id="nav-trend" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📈</span> 走势分析
       </button>
-      <button onclick="switchPanel('dancodes')" id="nav-dancodes" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🎯</span> 胆码预测
+      <button onclick="switchPanel('predict')" id="nav-predict" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🎯</span> 预测引擎
       </button>
       <button onclick="switchPanel('seven')" id="nav-seven" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🔢</span> 万能七码
-      </button>
-      <button onclick="switchPanel('rules')" id="nav-rules" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">⚡</span> 规则引擎
       </button>
       <button onclick="switchPanel('span')" id="nav-span" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📐</span> 跨度分析
       </button>
       <button onclick="switchPanel('filter')" id="nav-filter" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🔍</span> 万能组合
+      </button>
+      <button onclick="switchPanel('rulestats')" id="nav-rulestats" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📋</span> 规则统计
       </button>
       <button onclick="switchPanel('3ddata')" id="nav-3ddata" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📊</span> 3D数据
@@ -93,7 +93,7 @@
   </aside>
 
   <!-- 主内容区 -->
-  <main class="flex-1 overflow-y-auto scroll-hide p-8">
+  <main class="ml-64 h-screen overflow-y-auto scroll-hide p-8">
 
     <!-- 模块1: 号码生成器 -->
     <div id="panel-generator" class="panel active">
@@ -207,33 +207,63 @@
       </div>
     </div>
 
-    <!-- 模块3: 胆码预测 -->
-    <div id="panel-dancodes" class="panel">
+    <!-- 模块3+5: 预测引擎（胆码预测 + 规则引擎） -->
+    <div id="panel-predict" class="panel">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">胆码预测</h2>
-        <p class="text-slate-400 mt-1">基于上期组三对子预测下期胆码，查看胆码映射关系</p>
+        <h2 class="text-2xl font-bold text-white">预测引擎</h2>
+        <p class="text-slate-400 mt-1">胆码预测与规则引擎一站式分析</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="glass rounded-xl p-5">
-          <h3 class="text-sm font-semibold text-slate-200 mb-4">输入上期开奖号码</h3>
-          <input type="text" id="dan-input" placeholder="如: 112 或 223" maxlength="3" class="w-full px-4 py-3 rounded-lg text-lg text-center tracking-[0.5em] font-bold mb-4">
-          <button onclick="predictDan()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">预测胆码</button>
-          <div id="dan-result" class="mt-4 hidden">
-            <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-              <div class="text-xs text-slate-500 mb-2">号码类型</div>
-              <div id="dan-type" class="text-sm font-medium text-white mb-3"></div>
-              <div class="text-xs text-slate-500 mb-2">推荐胆码（未来1-3期重点关注）</div>
-              <div id="dan-codes" class="flex gap-2 flex-wrap"></div>
+      <!-- 第一部分: 胆码预测 -->
+      <div class="mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">🎯 胆码预测</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">输入上期开奖号码（组三/豹子号码效果更佳）</h4>
+            <input type="text" id="dan-input" placeholder="如: 112 或 223" maxlength="3" class="w-full px-4 py-3 rounded-lg text-lg text-center tracking-[0.5em] font-bold mb-4">
+            <button onclick="predictDan()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">预测胆码</button>
+            <div id="dan-result" class="mt-4 hidden">
+              <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+                <div class="text-xs text-slate-500 mb-2">号码类型</div>
+                <div id="dan-type" class="text-sm font-medium text-white mb-3"></div>
+                <div class="text-xs text-slate-500 mb-2">推荐胆码（未来1-3期重点关注）</div>
+                <div id="dan-codes" class="flex gap-2 flex-wrap"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">组三对子 → 胆码映射表</h4>
+            <div class="grid grid-cols-2 gap-2" id="dan-map">
+              <!-- JS填充 -->
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="glass rounded-xl p-5">
-          <h3 class="text-sm font-semibold text-slate-200 mb-4">组三对子 → 胆码映射表</h3>
-          <div class="grid grid-cols-2 gap-2" id="dan-map">
-            <!-- JS填充 -->
+      <!-- 第二部分: 规则引擎 -->
+      <div>
+        <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">⚡ 规则引擎</h3>
+        <div class="glass rounded-xl p-5 mb-6">
+          <div class="flex flex-wrap gap-4 items-end">
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">百位</label>
+              <input type="number" id="r-bai" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+            </div>
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">十位</label>
+              <input type="number" id="r-shi" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+            </div>
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">个位</label>
+              <input type="number" id="r-ge" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+            </div>
+            <button onclick="runRules()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">执行规则</button>
           </div>
+        </div>
+
+        <div id="rules-results" class="space-y-3">
+          <!-- JS填充 -->
         </div>
       </div>
     </div>
@@ -257,36 +287,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="seven-groups">
-        <!-- JS填充 -->
-      </div>
-    </div>
-
-    <!-- 模块5: 规则引擎 -->
-    <div id="panel-rules" class="panel">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">规则引擎</h2>
-        <p class="text-slate-400 mt-1">输入当前百位/十位/个位，自动触发9大预测规则</p>
-      </div>
-
-      <div class="glass rounded-xl p-5 mb-6">
-        <div class="flex flex-wrap gap-4 items-end">
-          <div>
-            <label class="text-xs text-slate-500 block mb-1">百位</label>
-            <input type="number" id="r-bai" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
-          </div>
-          <div>
-            <label class="text-xs text-slate-500 block mb-1">十位</label>
-            <input type="number" id="r-shi" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
-          </div>
-          <div>
-            <label class="text-xs text-slate-500 block mb-1">个位</label>
-            <input type="number" id="r-ge" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
-          </div>
-          <button onclick="runRules()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">执行规则</button>
-        </div>
-      </div>
-
-      <div id="rules-results" class="space-y-3">
         <!-- JS填充 -->
       </div>
     </div>
@@ -336,6 +336,137 @@
       </div>
     </div>
 
+
+    <!-- 模块8: 规则统计 -->
+    <div id="panel-rulestats" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">规则统计与验证</h2>
+        <p class="text-slate-400 mt-1">基于806期真实开奖数据的9条胆码规律命中率分析（2024-2026年）</p>
+      </div>
+
+      <!-- 统计总览卡片 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">分析期数</div>
+          <div class="text-2xl font-bold text-white num-badge">806</div>
+          <div class="tag tag-blue mt-2">2024-2026</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">高命中规则</div>
+          <div class="text-2xl font-bold text-green-400 num-badge">3</div>
+          <div class="tag tag-green mt-2">3期命中>85%</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">一般规则</div>
+          <div class="text-2xl font-bold text-yellow-400 num-badge">4</div>
+          <div class="tag tag-orange mt-2">3期命中55-65%</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">低效规则</div>
+          <div class="text-2xl font-bold text-red-400 num-badge">2</div>
+          <div class="tag tag-red mt-2">3期命中<25%</div>
+        </div>
+      </div>
+
+      <!-- 规则统计表格 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-semibold text-slate-200">📊 9条规则命中率统计</h3>
+          <button onclick="exportRuleStats()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">导出CSV</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-slate-500 text-xs">
+              <tr>
+                <th class="text-left py-2">规则</th>
+                <th class="text-center">触发</th>
+                <th class="text-center">1期命中</th>
+                <th class="text-center">1期遗漏</th>
+                <th class="text-center">1期命中率</th>
+                <th class="text-center">2期命中</th>
+                <th class="text-center">2期命中率</th>
+                <th class="text-center">3期命中</th>
+                <th class="text-center">3期命中率</th>
+                <th class="text-center">评级</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300" id="rule-stats-table">
+              <!-- JS填充 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 规则条件编辑器 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">⚙️ 规则条件编辑器（实时验证）</h3>
+        <p class="text-xs text-slate-500 mb-4">修改下方规则条件，点击"实时验证"即可基于当前100期数据重新计算命中率</p>
+        <div id="rule-editor-list" class="space-y-3">
+          <!-- JS填充 -->
+        </div>
+        <div class="flex gap-3 mt-4">
+          <button onclick="runCustomRuleValidation()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">实时验证</button>
+          <button onclick="resetRules()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors">重置规则</button>
+          <button onclick="exportDetailedRecords()" class="px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm transition-colors">导出详细记录</button>
+        </div>
+      </div>
+
+      <!-- 实时验证结果 -->
+      <div id="custom-validation-results" class="hidden">
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4">🔍 实时验证结果</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="text-slate-500 text-xs">
+                <tr>
+                  <th class="text-left py-2">规则</th>
+                  <th class="text-center">触发</th>
+                  <th class="text-center">1期命中</th>
+                  <th class="text-center">1期命中率</th>
+                  <th class="text-center">2期命中</th>
+                  <th class="text-center">2期命中率</th>
+                  <th class="text-center">3期命中</th>
+                  <th class="text-center">3期命中率</th>
+                  <th class="text-center">评级</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-300" id="custom-validation-table">
+                <!-- JS填充 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 详细触发记录 -->
+      <div id="detailed-records-panel" class="hidden">
+        <div class="glass rounded-xl p-5 mb-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-semibold text-slate-200">📋 每期触发详细记录</h3>
+            <select id="record-rule-select" onchange="showRuleRecords()" class="px-3 py-1.5 rounded-lg text-xs">
+              <option value="">选择规则...</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto max-h-96 overflow-y-auto scroll-hide">
+            <table class="w-full text-sm">
+              <thead class="text-slate-500 text-xs sticky top-0 bg-slate-900">
+                <tr>
+                  <th class="text-left py-2">触发期号</th>
+                  <th class="text-center">触发号码</th>
+                  <th class="text-center">下期号码</th>
+                  <th class="text-center">1期命中</th>
+                  <th class="text-center">2期命中</th>
+                  <th class="text-center">3期命中</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-300" id="rule-records-table">
+                <!-- JS填充 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 模块8: 3D数据看板 -->
     <div id="panel-3ddata" class="panel">
@@ -405,15 +536,75 @@
           </table>
         </div>
       </div>
+      <!-- 任两码和差预测 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📐 任两码和差预测</h3>
 
-      <!-- 全部历史数据 -->
-      <div class="glass rounded-xl p-5">
-        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📈 全部开奖历史</h3>
+        <!-- 下期预测 -->
+        <div class="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 mb-4">
+          <div class="text-xs text-slate-500 mb-2">基于最近3期（走势分析算法）预测下期和差参考值</div>
+          <div class="flex flex-wrap gap-2 items-center mb-2" id="liangma-next-pred">
+            <!-- JS填充 -->
+          </div>
+          <div class="text-xs text-slate-400" id="liangma-next-detail">
+            <!-- JS填充 -->
+          </div>
+        </div>
+
+        <!-- 历史验证 -->
+        <h4 class="text-xs text-slate-500 mb-2">历史验证（前3期 → 预测值 vs 当期开奖号任两码和差）</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-slate-500 text-xs">
+              <tr>
+                <th class="text-left py-2">期号</th>
+                <th class="text-center">开奖号</th>
+                <th class="text-center">百+十</th>
+                <th class="text-center">百+个</th>
+                <th class="text-center">十+个</th>
+                <th class="text-center">|百-十|</th>
+                <th class="text-center">|百-个|</th>
+                <th class="text-center">|十-个|</th>
+                <th class="text-center">预测值</th>
+                <th class="text-center">结果</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300" id="liangma-verify-table">
+              <!-- JS填充 -->
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700 text-xs" id="liangma-summary">
+          <!-- JS填充 -->
+        </div>
+      </div>
+
+      <!-- 预测验证 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">🎯 预测验证</h3>
+        <div class="flex flex-wrap gap-3 items-end mb-4">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">预测百位</label>
+            <input type="number" id="pred-bai" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">预测十位</label>
+            <input type="number" id="pred-shi" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">预测个位</label>
+            <input type="number" id="pred-ge" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <button onclick="checkPrediction()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">验证历史</button>
+          <button onclick="clearPrediction()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors">清除</button>
+        </div>
+        <div id="pred-summary" class="hidden mb-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700 text-sm"></div>
         <div class="grid grid-cols-10 sm:grid-cols-15 md:grid-cols-20 gap-1.5 max-h-80 overflow-y-auto scroll-hide p-1" id="history-grid">
           <!-- JS填充 -->
         </div>
       </div>
     </div>
+
 
   </main>
 
@@ -430,7 +621,15 @@ const STRAIGHT_BETS = ['215', '212', '214', '245', '242', '244', '255', '252', '
 const LATEST_ISSUE = "26103";
 const LATEST_NUM = "661";
 
-// ==================== 核心工具函数 ====================
+// 806期历史数据（2024-2026，按时间排序）
+const HISTORY_806 = [{"period": "2024001", "number": "218"}, {"period": "2024002", "number": "669"}, {"period": "2024003", "number": "729"}, {"period": "2024004", "number": "705"}, {"period": "2024005", "number": "806"}, {"period": "2024006", "number": "212"}, {"period": "2024007", "number": "633"}, {"period": "2024008", "number": "423"}, {"period": "2024009", "number": "265"}, {"period": "2024010", "number": "437"}, {"period": "2024011", "number": "927"}, {"period": "2024012", "number": "590"}, {"period": "2024013", "number": "468"}, {"period": "2024014", "number": "251"}, {"period": "2024015", "number": "438"}, {"period": "2024016", "number": "920"}, {"period": "2024017", "number": "659"}, {"period": "2024018", "number": "430"}, {"period": "2024019", "number": "953"}, {"period": "2024020", "number": "868"}, {"period": "2024021", "number": "446"}, {"period": "2024022", "number": "285"}, {"period": "2024023", "number": "247"}, {"period": "2024024", "number": "473"}, {"period": "2024025", "number": "749"}, {"period": "2024026", "number": "149"}, {"period": "2024027", "number": "849"}, {"period": "2024028", "number": "662"}, {"period": "2024029", "number": "094"}, {"period": "2024030", "number": "935"}, {"period": "2024031", "number": "060"}, {"period": "2024032", "number": "995"}, {"period": "2024033", "number": "945"}, {"period": "2024034", "number": "856"}, {"period": "2024035", "number": "045"}, {"period": "2024036", "number": "265"}, {"period": "2024037", "number": "460"}, {"period": "2024038", "number": "676"}, {"period": "2024039", "number": "228"}, {"period": "2024040", "number": "736"}, {"period": "2024041", "number": "315"}, {"period": "2024042", "number": "086"}, {"period": "2024043", "number": "257"}, {"period": "2024044", "number": "363"}, {"period": "2024045", "number": "406"}, {"period": "2024046", "number": "730"}, {"period": "2024047", "number": "420"}, {"period": "2024048", "number": "128"}, {"period": "2024049", "number": "811"}, {"period": "2024050", "number": "634"}, {"period": "2024051", "number": "340"}, {"period": "2024052", "number": "310"}, {"period": "2024053", "number": "478"}, {"period": "2024054", "number": "192"}, {"period": "2024055", "number": "589"}, {"period": "2024056", "number": "542"}, {"period": "2024057", "number": "805"}, {"period": "2024058", "number": "469"}, {"period": "2024059", "number": "758"}, {"period": "2024060", "number": "897"}, {"period": "2024061", "number": "406"}, {"period": "2024062", "number": "377"}, {"period": "2024063", "number": "349"}, {"period": "2024064", "number": "009"}, {"period": "2024065", "number": "469"}, {"period": "2024066", "number": "198"}, {"period": "2024067", "number": "709"}, {"period": "2024068", "number": "642"}, {"period": "2024069", "number": "451"}, {"period": "2024070", "number": "671"}, {"period": "2024071", "number": "213"}, {"period": "2024072", "number": "977"}, {"period": "2024073", "number": "258"}, {"period": "2024074", "number": "041"}, {"period": "2024075", "number": "254"}, {"period": "2024076", "number": "655"}, {"period": "2024077", "number": "336"}, {"period": "2024078", "number": "397"}, {"period": "2024079", "number": "931"}, {"period": "2024080", "number": "775"}, {"period": "2024081", "number": "108"}, {"period": "2024082", "number": "920"}, {"period": "2024083", "number": "899"}, {"period": "2024084", "number": "219"}, {"period": "2024085", "number": "490"}, {"period": "2024086", "number": "532"}, {"period": "2024087", "number": "797"}, {"period": "2024088", "number": "761"}, {"period": "2024089", "number": "457"}, {"period": "2024090", "number": "890"}, {"period": "2024091", "number": "564"}, {"period": "2024092", "number": "071"}, {"period": "2024093", "number": "647"}, {"period": "2024094", "number": "679"}, {"period": "2024095", "number": "257"}, {"period": "2024096", "number": "129"}, {"period": "2024097", "number": "389"}, {"period": "2024098", "number": "620"}, {"period": "2024099", "number": "190"}, {"period": "2024100", "number": "936"}, {"period": "2024101", "number": "594"}, {"period": "2024102", "number": "339"}, {"period": "2024103", "number": "984"}, {"period": "2024104", "number": "579"}, {"period": "2024105", "number": "976"}, {"period": "2024106", "number": "127"}, {"period": "2024107", "number": "062"}, {"period": "2024108", "number": "432"}, {"period": "2024109", "number": "181"}, {"period": "2024110", "number": "506"}, {"period": "2024111", "number": "206"}, {"period": "2024112", "number": "630"}, {"period": "2024113", "number": "242"}, {"period": "2024114", "number": "075"}, {"period": "2024115", "number": "099"}, {"period": "2024116", "number": "851"}, {"period": "2024117", "number": "989"}, {"period": "2024118", "number": "343"}, {"period": "2024119", "number": "508"}, {"period": "2024120", "number": "549"}, {"period": "2024121", "number": "289"}, {"period": "2024122", "number": "708"}, {"period": "2024123", "number": "183"}, {"period": "2024124", "number": "787"}, {"period": "2024125", "number": "649"}, {"period": "2024126", "number": "323"}, {"period": "2024127", "number": "214"}, {"period": "2024128", "number": "573"}, {"period": "2024129", "number": "067"}, {"period": "2024130", "number": "066"}, {"period": "2024131", "number": "069"}, {"period": "2024132", "number": "652"}, {"period": "2024133", "number": "741"}, {"period": "2024134", "number": "640"}, {"period": "2024135", "number": "035"}, {"period": "2024136", "number": "227"}, {"period": "2024137", "number": "982"}, {"period": "2024138", "number": "955"}, {"period": "2024139", "number": "748"}, {"period": "2024140", "number": "536"}, {"period": "2024141", "number": "256"}, {"period": "2024142", "number": "813"}, {"period": "2024143", "number": "955"}, {"period": "2024144", "number": "816"}, {"period": "2024145", "number": "756"}, {"period": "2024146", "number": "180"}, {"period": "2024147", "number": "225"}, {"period": "2024148", "number": "426"}, {"period": "2024149", "number": "153"}, {"period": "2024150", "number": "356"}, {"period": "2024151", "number": "765"}, {"period": "2024152", "number": "848"}, {"period": "2024153", "number": "287"}, {"period": "2024154", "number": "834"}, {"period": "2024155", "number": "411"}, {"period": "2024156", "number": "180"}, {"period": "2024157", "number": "126"}, {"period": "2024158", "number": "821"}, {"period": "2024159", "number": "212"}, {"period": "2024160", "number": "690"}, {"period": "2024161", "number": "468"}, {"period": "2024162", "number": "164"}, {"period": "2024163", "number": "304"}, {"period": "2024164", "number": "354"}, {"period": "2024165", "number": "145"}, {"period": "2024166", "number": "397"}, {"period": "2024167", "number": "220"}, {"period": "2024168", "number": "752"}, {"period": "2024169", "number": "402"}, {"period": "2024170", "number": "225"}, {"period": "2024171", "number": "480"}, {"period": "2024172", "number": "908"}, {"period": "2024173", "number": "449"}, {"period": "2024174", "number": "236"}, {"period": "2024175", "number": "488"}, {"period": "2024176", "number": "108"}, {"period": "2024177", "number": "460"}, {"period": "2024178", "number": "581"}, {"period": "2024179", "number": "005"}, {"period": "2024180", "number": "918"}, {"period": "2024181", "number": "230"}, {"period": "2024182", "number": "884"}, {"period": "2024183", "number": "443"}, {"period": "2024184", "number": "933"}, {"period": "2024185", "number": "306"}, {"period": "2024186", "number": "579"}, {"period": "2024187", "number": "380"}, {"period": "2024188", "number": "956"}, {"period": "2024189", "number": "530"}, {"period": "2024190", "number": "410"}, {"period": "2024191", "number": "382"}, {"period": "2024192", "number": "676"}, {"period": "2024193", "number": "681"}, {"period": "2024194", "number": "137"}, {"period": "2024195", "number": "725"}, {"period": "2024196", "number": "056"}, {"period": "2024197", "number": "224"}, {"period": "2024198", "number": "710"}, {"period": "2024199", "number": "147"}, {"period": "2024200", "number": "309"}, {"period": "2024201", "number": "843"}, {"period": "2024202", "number": "552"}, {"period": "2024203", "number": "172"}, {"period": "2024204", "number": "390"}, {"period": "2024205", "number": "651"}, {"period": "2024206", "number": "818"}, {"period": "2024207", "number": "892"}, {"period": "2024208", "number": "281"}, {"period": "2024209", "number": "676"}, {"period": "2024210", "number": "449"}, {"period": "2024211", "number": "054"}, {"period": "2024212", "number": "089"}, {"period": "2024213", "number": "009"}, {"period": "2024214", "number": "365"}, {"period": "2024215", "number": "483"}, {"period": "2024216", "number": "444"}, {"period": "2024217", "number": "405"}, {"period": "2024218", "number": "467"}, {"period": "2024219", "number": "305"}, {"period": "2024220", "number": "414"}, {"period": "2024221", "number": "103"}, {"period": "2024222", "number": "564"}, {"period": "2024223", "number": "773"}, {"period": "2024224", "number": "560"}, {"period": "2024225", "number": "884"}, {"period": "2024226", "number": "380"}, {"period": "2024227", "number": "312"}, {"period": "2024228", "number": "298"}, {"period": "2024229", "number": "911"}, {"period": "2024230", "number": "497"}, {"period": "2024231", "number": "938"}, {"period": "2024232", "number": "012"}, {"period": "2024233", "number": "397"}, {"period": "2024234", "number": "715"}, {"period": "2024235", "number": "492"}, {"period": "2024236", "number": "512"}, {"period": "2024237", "number": "274"}, {"period": "2024238", "number": "469"}, {"period": "2024239", "number": "524"}, {"period": "2024240", "number": "065"}, {"period": "2024241", "number": "470"}, {"period": "2024242", "number": "623"}, {"period": "2024243", "number": "955"}, {"period": "2024244", "number": "863"}, {"period": "2024245", "number": "741"}, {"period": "2024246", "number": "710"}, {"period": "2024247", "number": "783"}, {"period": "2024248", "number": "861"}, {"period": "2024249", "number": "449"}, {"period": "2024250", "number": "253"}, {"period": "2024251", "number": "156"}, {"period": "2024252", "number": "086"}, {"period": "2024253", "number": "274"}, {"period": "2024254", "number": "409"}, {"period": "2024255", "number": "096"}, {"period": "2024256", "number": "749"}, {"period": "2024257", "number": "199"}, {"period": "2024258", "number": "077"}, {"period": "2024259", "number": "249"}, {"period": "2024260", "number": "926"}, {"period": "2024261", "number": "766"}, {"period": "2024262", "number": "465"}, {"period": "2024263", "number": "292"}, {"period": "2024264", "number": "710"}, {"period": "2024265", "number": "245"}, {"period": "2024266", "number": "390"}, {"period": "2024267", "number": "227"}, {"period": "2024268", "number": "931"}, {"period": "2024269", "number": "388"}, {"period": "2024270", "number": "699"}, {"period": "2024271", "number": "795"}, {"period": "2024272", "number": "275"}, {"period": "2024273", "number": "833"}, {"period": "2024274", "number": "172"}, {"period": "2024275", "number": "827"}, {"period": "2024276", "number": "086"}, {"period": "2024277", "number": "684"}, {"period": "2024278", "number": "221"}, {"period": "2024279", "number": "060"}, {"period": "2024280", "number": "248"}, {"period": "2024281", "number": "900"}, {"period": "2024282", "number": "983"}, {"period": "2024283", "number": "419"}, {"period": "2024284", "number": "342"}, {"period": "2024285", "number": "718"}, {"period": "2024286", "number": "621"}, {"period": "2024287", "number": "192"}, {"period": "2024288", "number": "839"}, {"period": "2024289", "number": "989"}, {"period": "2024290", "number": "911"}, {"period": "2024291", "number": "426"}, {"period": "2024292", "number": "462"}, {"period": "2024293", "number": "521"}, {"period": "2024294", "number": "364"}, {"period": "2024295", "number": "571"}, {"period": "2024296", "number": "816"}, {"period": "2024297", "number": "372"}, {"period": "2024298", "number": "055"}, {"period": "2024299", "number": "949"}, {"period": "2024300", "number": "666"}, {"period": "2024301", "number": "435"}, {"period": "2024302", "number": "516"}, {"period": "2024303", "number": "336"}, {"period": "2024304", "number": "169"}, {"period": "2024305", "number": "966"}, {"period": "2024306", "number": "296"}, {"period": "2024307", "number": "579"}, {"period": "2024308", "number": "654"}, {"period": "2024309", "number": "539"}, {"period": "2024310", "number": "603"}, {"period": "2024311", "number": "067"}, {"period": "2024312", "number": "754"}, {"period": "2024313", "number": "095"}, {"period": "2024314", "number": "672"}, {"period": "2024315", "number": "802"}, {"period": "2024316", "number": "789"}, {"period": "2024317", "number": "386"}, {"period": "2024318", "number": "525"}, {"period": "2024319", "number": "726"}, {"period": "2024320", "number": "778"}, {"period": "2024321", "number": "542"}, {"period": "2024322", "number": "867"}, {"period": "2024323", "number": "536"}, {"period": "2024324", "number": "384"}, {"period": "2024325", "number": "158"}, {"period": "2024326", "number": "722"}, {"period": "2024327", "number": "280"}, {"period": "2024328", "number": "306"}, {"period": "2024329", "number": "910"}, {"period": "2024330", "number": "167"}, {"period": "2024331", "number": "964"}, {"period": "2024332", "number": "765"}, {"period": "2024333", "number": "951"}, {"period": "2024334", "number": "541"}, {"period": "2024335", "number": "593"}, {"period": "2024336", "number": "964"}, {"period": "2024337", "number": "843"}, {"period": "2024338", "number": "977"}, {"period": "2024339", "number": "509"}, {"period": "2024340", "number": "278"}, {"period": "2024341", "number": "371"}, {"period": "2024342", "number": "483"}, {"period": "2024343", "number": "214"}, {"period": "2024344", "number": "305"}, {"period": "2024345", "number": "317"}, {"period": "2024346", "number": "056"}, {"period": "2024347", "number": "392"}, {"period": "2024348", "number": "928"}, {"period": "2024349", "number": "108"}, {"period": "2024350", "number": "672"}, {"period": "2024351", "number": "657"}, {"period": "2024352", "number": "292"}, {"period": "2025001", "number": "703"}, {"period": "2025002", "number": "916"}, {"period": "2025003", "number": "214"}, {"period": "2025004", "number": "634"}, {"period": "2025005", "number": "085"}, {"period": "2025006", "number": "898"}, {"period": "2025007", "number": "141"}, {"period": "2025008", "number": "260"}, {"period": "2025009", "number": "416"}, {"period": "2025010", "number": "333"}, {"period": "2025011", "number": "518"}, {"period": "2025012", "number": "487"}, {"period": "2025013", "number": "606"}, {"period": "2025014", "number": "679"}, {"period": "2025015", "number": "942"}, {"period": "2025016", "number": "104"}, {"period": "2025017", "number": "027"}, {"period": "2025018", "number": "836"}, {"period": "2025019", "number": "710"}, {"period": "2025020", "number": "056"}, {"period": "2025021", "number": "468"}, {"period": "2025022", "number": "638"}, {"period": "2025023", "number": "591"}, {"period": "2025024", "number": "762"}, {"period": "2025025", "number": "486"}, {"period": "2025026", "number": "588"}, {"period": "2025027", "number": "383"}, {"period": "2025028", "number": "409"}, {"period": "2025029", "number": "096"}, {"period": "2025030", "number": "302"}, {"period": "2025031", "number": "379"}, {"period": "2025032", "number": "499"}, {"period": "2025033", "number": "606"}, {"period": "2025034", "number": "261"}, {"period": "2025035", "number": "778"}, {"period": "2025036", "number": "617"}, {"period": "2025037", "number": "131"}, {"period": "2025038", "number": "847"}, {"period": "2025039", "number": "932"}, {"period": "2025040", "number": "428"}, {"period": "2025041", "number": "401"}, {"period": "2025042", "number": "775"}, {"period": "2025043", "number": "475"}, {"period": "2025044", "number": "912"}, {"period": "2025045", "number": "554"}, {"period": "2025046", "number": "490"}, {"period": "2025047", "number": "248"}, {"period": "2025048", "number": "640"}, {"period": "2025049", "number": "004"}, {"period": "2025050", "number": "806"}, {"period": "2025051", "number": "905"}, {"period": "2025052", "number": "585"}, {"period": "2025053", "number": "895"}, {"period": "2025054", "number": "497"}, {"period": "2025055", "number": "368"}, {"period": "2025056", "number": "492"}, {"period": "2025057", "number": "397"}, {"period": "2025058", "number": "405"}, {"period": "2025059", "number": "847"}, {"period": "2025060", "number": "938"}, {"period": "2025061", "number": "476"}, {"period": "2025062", "number": "810"}, {"period": "2025063", "number": "405"}, {"period": "2025064", "number": "928"}, {"period": "2025065", "number": "538"}, {"period": "2025066", "number": "720"}, {"period": "2025067", "number": "385"}, {"period": "2025068", "number": "555"}, {"period": "2025069", "number": "906"}, {"period": "2025070", "number": "748"}, {"period": "2025071", "number": "434"}, {"period": "2025072", "number": "272"}, {"period": "2025073", "number": "778"}, {"period": "2025074", "number": "419"}, {"period": "2025075", "number": "709"}, {"period": "2025076", "number": "781"}, {"period": "2025077", "number": "625"}, {"period": "2025078", "number": "000"}, {"period": "2025079", "number": "657"}, {"period": "2025080", "number": "500"}, {"period": "2025081", "number": "403"}, {"period": "2025082", "number": "417"}, {"period": "2025083", "number": "915"}, {"period": "2025084", "number": "030"}, {"period": "2025085", "number": "338"}, {"period": "2025086", "number": "388"}, {"period": "2025087", "number": "826"}, {"period": "2025088", "number": "022"}, {"period": "2025089", "number": "658"}, {"period": "2025090", "number": "159"}, {"period": "2025091", "number": "135"}, {"period": "2025092", "number": "317"}, {"period": "2025093", "number": "545"}, {"period": "2025094", "number": "649"}, {"period": "2025095", "number": "068"}, {"period": "2025096", "number": "385"}, {"period": "2025097", "number": "542"}, {"period": "2025098", "number": "714"}, {"period": "2025099", "number": "707"}, {"period": "2025100", "number": "953"}, {"period": "2025101", "number": "016"}, {"period": "2025102", "number": "161"}, {"period": "2025103", "number": "370"}, {"period": "2025104", "number": "877"}, {"period": "2025105", "number": "015"}, {"period": "2025106", "number": "752"}, {"period": "2025107", "number": "027"}, {"period": "2025108", "number": "407"}, {"period": "2025109", "number": "841"}, {"period": "2025110", "number": "914"}, {"period": "2025111", "number": "270"}, {"period": "2025112", "number": "954"}, {"period": "2025113", "number": "635"}, {"period": "2025114", "number": "375"}, {"period": "2025115", "number": "206"}, {"period": "2025116", "number": "320"}, {"period": "2025117", "number": "849"}, {"period": "2025118", "number": "621"}, {"period": "2025119", "number": "315"}, {"period": "2025120", "number": "912"}, {"period": "2025121", "number": "120"}, {"period": "2025122", "number": "488"}, {"period": "2025123", "number": "725"}, {"period": "2025124", "number": "809"}, {"period": "2025125", "number": "351"}, {"period": "2025126", "number": "320"}, {"period": "2025127", "number": "431"}, {"period": "2025128", "number": "814"}, {"period": "2025129", "number": "915"}, {"period": "2025130", "number": "204"}, {"period": "2025131", "number": "203"}, {"period": "2025132", "number": "689"}, {"period": "2025133", "number": "645"}, {"period": "2025134", "number": "748"}, {"period": "2025135", "number": "458"}, {"period": "2025136", "number": "113"}, {"period": "2025137", "number": "838"}, {"period": "2025138", "number": "296"}, {"period": "2025139", "number": "598"}, {"period": "2025140", "number": "149"}, {"period": "2025141", "number": "202"}, {"period": "2025142", "number": "916"}, {"period": "2025143", "number": "256"}, {"period": "2025144", "number": "666"}, {"period": "2025145", "number": "267"}, {"period": "2025146", "number": "897"}, {"period": "2025147", "number": "321"}, {"period": "2025148", "number": "838"}, {"period": "2025149", "number": "734"}, {"period": "2025150", "number": "321"}, {"period": "2025151", "number": "718"}, {"period": "2025152", "number": "210"}, {"period": "2025153", "number": "069"}, {"period": "2025154", "number": "923"}, {"period": "2025155", "number": "499"}, {"period": "2025156", "number": "775"}, {"period": "2025157", "number": "969"}, {"period": "2025158", "number": "701"}, {"period": "2025159", "number": "073"}, {"period": "2025160", "number": "503"}, {"period": "2025161", "number": "748"}, {"period": "2025162", "number": "275"}, {"period": "2025163", "number": "636"}, {"period": "2025164", "number": "337"}, {"period": "2025165", "number": "609"}, {"period": "2025166", "number": "808"}, {"period": "2025167", "number": "702"}, {"period": "2025168", "number": "514"}, {"period": "2025169", "number": "978"}, {"period": "2025170", "number": "475"}, {"period": "2025171", "number": "113"}, {"period": "2025172", "number": "406"}, {"period": "2025173", "number": "092"}, {"period": "2025174", "number": "533"}, {"period": "2025175", "number": "616"}, {"period": "2025176", "number": "122"}, {"period": "2025177", "number": "497"}, {"period": "2025178", "number": "728"}, {"period": "2025179", "number": "280"}, {"period": "2025180", "number": "260"}, {"period": "2025181", "number": "886"}, {"period": "2025182", "number": "708"}, {"period": "2025183", "number": "744"}, {"period": "2025184", "number": "799"}, {"period": "2025185", "number": "164"}, {"period": "2025186", "number": "227"}, {"period": "2025187", "number": "761"}, {"period": "2025188", "number": "018"}, {"period": "2025189", "number": "907"}, {"period": "2025190", "number": "402"}, {"period": "2025191", "number": "202"}, {"period": "2025192", "number": "691"}, {"period": "2025193", "number": "876"}, {"period": "2025194", "number": "726"}, {"period": "2025195", "number": "980"}, {"period": "2025196", "number": "734"}, {"period": "2025197", "number": "057"}, {"period": "2025198", "number": "898"}, {"period": "2025199", "number": "943"}, {"period": "2025200", "number": "015"}, {"period": "2025201", "number": "846"}, {"period": "2025202", "number": "953"}, {"period": "2025203", "number": "013"}, {"period": "2025204", "number": "007"}, {"period": "2025205", "number": "920"}, {"period": "2025206", "number": "444"}, {"period": "2025207", "number": "255"}, {"period": "2025208", "number": "432"}, {"period": "2025209", "number": "387"}, {"period": "2025210", "number": "520"}, {"period": "2025211", "number": "897"}, {"period": "2025212", "number": "456"}, {"period": "2025213", "number": "381"}, {"period": "2025214", "number": "920"}, {"period": "2025215", "number": "853"}, {"period": "2025216", "number": "625"}, {"period": "2025217", "number": "894"}, {"period": "2025218", "number": "526"}, {"period": "2025219", "number": "900"}, {"period": "2025220", "number": "536"}, {"period": "2025221", "number": "296"}, {"period": "2025222", "number": "010"}, {"period": "2025223", "number": "736"}, {"period": "2025224", "number": "990"}, {"period": "2025225", "number": "806"}, {"period": "2025226", "number": "180"}, {"period": "2025227", "number": "611"}, {"period": "2025228", "number": "465"}, {"period": "2025229", "number": "108"}, {"period": "2025230", "number": "439"}, {"period": "2025231", "number": "732"}, {"period": "2025232", "number": "044"}, {"period": "2025233", "number": "259"}, {"period": "2025234", "number": "620"}, {"period": "2025235", "number": "969"}, {"period": "2025236", "number": "355"}, {"period": "2025237", "number": "590"}, {"period": "2025238", "number": "860"}, {"period": "2025239", "number": "125"}, {"period": "2025240", "number": "419"}, {"period": "2025241", "number": "160"}, {"period": "2025242", "number": "990"}, {"period": "2025243", "number": "176"}, {"period": "2025244", "number": "673"}, {"period": "2025245", "number": "848"}, {"period": "2025246", "number": "997"}, {"period": "2025247", "number": "262"}, {"period": "2025248", "number": "526"}, {"period": "2025249", "number": "952"}, {"period": "2025250", "number": "902"}, {"period": "2025251", "number": "868"}, {"period": "2025252", "number": "792"}, {"period": "2025253", "number": "457"}, {"period": "2025254", "number": "072"}, {"period": "2025255", "number": "264"}, {"period": "2025256", "number": "406"}, {"period": "2025257", "number": "860"}, {"period": "2025258", "number": "626"}, {"period": "2025259", "number": "625"}, {"period": "2025260", "number": "199"}, {"period": "2025261", "number": "751"}, {"period": "2025262", "number": "914"}, {"period": "2025263", "number": "399"}, {"period": "2025264", "number": "734"}, {"period": "2025265", "number": "546"}, {"period": "2025266", "number": "723"}, {"period": "2025267", "number": "391"}, {"period": "2025268", "number": "674"}, {"period": "2025269", "number": "055"}, {"period": "2025270", "number": "408"}, {"period": "2025271", "number": "727"}, {"period": "2025272", "number": "967"}, {"period": "2025273", "number": "045"}, {"period": "2025274", "number": "596"}, {"period": "2025275", "number": "203"}, {"period": "2025276", "number": "714"}, {"period": "2025277", "number": "061"}, {"period": "2025278", "number": "629"}, {"period": "2025279", "number": "752"}, {"period": "2025280", "number": "411"}, {"period": "2025281", "number": "897"}, {"period": "2025282", "number": "416"}, {"period": "2025283", "number": "664"}, {"period": "2025284", "number": "844"}, {"period": "2025285", "number": "172"}, {"period": "2025286", "number": "827"}, {"period": "2025287", "number": "805"}, {"period": "2025288", "number": "767"}, {"period": "2025289", "number": "473"}, {"period": "2025290", "number": "332"}, {"period": "2025291", "number": "794"}, {"period": "2025292", "number": "117"}, {"period": "2025293", "number": "154"}, {"period": "2025294", "number": "513"}, {"period": "2025295", "number": "273"}, {"period": "2025296", "number": "537"}, {"period": "2025297", "number": "051"}, {"period": "2025298", "number": "544"}, {"period": "2025299", "number": "385"}, {"period": "2025300", "number": "867"}, {"period": "2025301", "number": "755"}, {"period": "2025302", "number": "715"}, {"period": "2025303", "number": "933"}, {"period": "2025304", "number": "471"}, {"period": "2025305", "number": "310"}, {"period": "2025306", "number": "697"}, {"period": "2025307", "number": "164"}, {"period": "2025308", "number": "448"}, {"period": "2025309", "number": "190"}, {"period": "2025310", "number": "169"}, {"period": "2025311", "number": "640"}, {"period": "2025312", "number": "689"}, {"period": "2025313", "number": "664"}, {"period": "2025314", "number": "917"}, {"period": "2025315", "number": "729"}, {"period": "2025316", "number": "775"}, {"period": "2025317", "number": "301"}, {"period": "2025318", "number": "430"}, {"period": "2025319", "number": "294"}, {"period": "2025320", "number": "121"}, {"period": "2025321", "number": "847"}, {"period": "2025322", "number": "226"}, {"period": "2025323", "number": "551"}, {"period": "2025324", "number": "661"}, {"period": "2025325", "number": "165"}, {"period": "2025326", "number": "185"}, {"period": "2025327", "number": "789"}, {"period": "2025328", "number": "040"}, {"period": "2025329", "number": "564"}, {"period": "2025330", "number": "062"}, {"period": "2025331", "number": "050"}, {"period": "2025332", "number": "885"}, {"period": "2025333", "number": "273"}, {"period": "2025334", "number": "198"}, {"period": "2025335", "number": "051"}, {"period": "2025336", "number": "641"}, {"period": "2025337", "number": "876"}, {"period": "2025338", "number": "689"}, {"period": "2025339", "number": "676"}, {"period": "2025340", "number": "130"}, {"period": "2025341", "number": "996"}, {"period": "2025342", "number": "681"}, {"period": "2025343", "number": "645"}, {"period": "2025344", "number": "622"}, {"period": "2025345", "number": "630"}, {"period": "2025346", "number": "897"}, {"period": "2025347", "number": "192"}, {"period": "2025348", "number": "278"}, {"period": "2025349", "number": "743"}, {"period": "2025350", "number": "580"}, {"period": "2025351", "number": "452"}, {"period": "2026001", "number": "298"}, {"period": "2026002", "number": "520"}, {"period": "2026003", "number": "601"}, {"period": "2026004", "number": "019"}, {"period": "2026005", "number": "476"}, {"period": "2026006", "number": "244"}, {"period": "2026007", "number": "353"}, {"period": "2026008", "number": "252"}, {"period": "2026009", "number": "265"}, {"period": "2026010", "number": "667"}, {"period": "2026011", "number": "647"}, {"period": "2026012", "number": "241"}, {"period": "2026013", "number": "513"}, {"period": "2026014", "number": "050"}, {"period": "2026015", "number": "532"}, {"period": "2026016", "number": "582"}, {"period": "2026017", "number": "945"}, {"period": "2026018", "number": "494"}, {"period": "2026019", "number": "223"}, {"period": "2026020", "number": "676"}, {"period": "2026021", "number": "559"}, {"period": "2026022", "number": "678"}, {"period": "2026023", "number": "784"}, {"period": "2026024", "number": "911"}, {"period": "2026025", "number": "029"}, {"period": "2026026", "number": "099"}, {"period": "2026027", "number": "126"}, {"period": "2026028", "number": "270"}, {"period": "2026029", "number": "003"}, {"period": "2026030", "number": "134"}, {"period": "2026031", "number": "142"}, {"period": "2026032", "number": "452"}, {"period": "2026033", "number": "119"}, {"period": "2026034", "number": "052"}, {"period": "2026035", "number": "213"}, {"period": "2026036", "number": "762"}, {"period": "2026037", "number": "420"}, {"period": "2026038", "number": "467"}, {"period": "2026039", "number": "450"}, {"period": "2026040", "number": "425"}, {"period": "2026041", "number": "901"}, {"period": "2026042", "number": "854"}, {"period": "2026043", "number": "765"}, {"period": "2026044", "number": "589"}, {"period": "2026045", "number": "181"}, {"period": "2026046", "number": "291"}, {"period": "2026047", "number": "936"}, {"period": "2026048", "number": "612"}, {"period": "2026049", "number": "110"}, {"period": "2026050", "number": "689"}, {"period": "2026051", "number": "302"}, {"period": "2026052", "number": "277"}, {"period": "2026053", "number": "755"}, {"period": "2026054", "number": "217"}, {"period": "2026055", "number": "107"}, {"period": "2026056", "number": "477"}, {"period": "2026057", "number": "264"}, {"period": "2026058", "number": "543"}, {"period": "2026059", "number": "794"}, {"period": "2026060", "number": "943"}, {"period": "2026061", "number": "429"}, {"period": "2026062", "number": "294"}, {"period": "2026063", "number": "517"}, {"period": "2026064", "number": "604"}, {"period": "2026065", "number": "057"}, {"period": "2026066", "number": "934"}, {"period": "2026067", "number": "695"}, {"period": "2026068", "number": "706"}, {"period": "2026069", "number": "908"}, {"period": "2026070", "number": "484"}, {"period": "2026071", "number": "261"}, {"period": "2026072", "number": "245"}, {"period": "2026073", "number": "504"}, {"period": "2026074", "number": "487"}, {"period": "2026075", "number": "816"}, {"period": "2026076", "number": "863"}, {"period": "2026077", "number": "112"}, {"period": "2026078", "number": "049"}, {"period": "2026079", "number": "233"}, {"period": "2026080", "number": "802"}, {"period": "2026081", "number": "827"}, {"period": "2026082", "number": "942"}, {"period": "2026083", "number": "506"}, {"period": "2026084", "number": "456"}, {"period": "2026085", "number": "118"}, {"period": "2026086", "number": "382"}, {"period": "2026087", "number": "911"}, {"period": "2026088", "number": "608"}, {"period": "2026089", "number": "922"}, {"period": "2026090", "number": "816"}, {"period": "2026091", "number": "537"}, {"period": "2026092", "number": "870"}, {"period": "2026093", "number": "518"}, {"period": "2026094", "number": "418"}, {"period": "2026095", "number": "022"}, {"period": "2026096", "number": "689"}, {"period": "2026097", "number": "818"}, {"period": "2026098", "number": "513"}, {"period": "2026099", "number": "877"}, {"period": "2026100", "number": "414"}, {"period": "2026101", "number": "584"}, {"period": "2026102", "number": "420"}, {"period": "2026103", "number": "661"}];
+
+// 806期规则统计结果
+const RULE_STATS_806 = [{"id": 1, "name": "规则1: 百位=6 → 后两位∈{50,51,53}", "trigger_count": 84, "hit_1": 1, "hit_2": 3, "hit_3": 5, "miss_1": 83, "miss_2": 81, "miss_3": 79}, {"id": 2, "name": "规则2: 百位=8 → 包含胆码5", "trigger_count": 76, "hit_1": 22, "hit_2": 38, "hit_3": 48, "miss_1": 54, "miss_2": 38, "miss_3": 28}, {"id": 3, "name": "规则3: 百位=9 → 包含胆码2", "trigger_count": 83, "hit_1": 19, "hit_2": 34, "hit_3": 50, "miss_1": 64, "miss_2": 49, "miss_3": 33}, {"id": 4, "name": "规则4: 十位=3 → 包含胆码2或9", "trigger_count": 70, "hit_1": 36, "hit_2": 52, "hit_3": 62, "miss_1": 34, "miss_2": 18, "miss_3": 8}, {"id": 5, "name": "规则5: 十位=0 → 出现组三", "trigger_count": 87, "hit_1": 17, "hit_2": 34, "hit_3": 50, "miss_1": 70, "miss_2": 53, "miss_3": 37}, {"id": 6, "name": "规则6: 出现组三 → 跨度=9", "trigger_count": 195, "hit_1": 12, "hit_2": 28, "hit_3": 38, "miss_1": 183, "miss_2": 167, "miss_3": 157}, {"id": 7, "name": "规则7: 十位=1 → 冷码8回补", "trigger_count": 93, "hit_1": 19, "hit_2": 40, "hit_3": 55, "miss_1": 74, "miss_2": 53, "miss_3": 38}, {"id": 8, "name": "规则8: 百位=0 → 包含胆码4或5,或十位=5", "trigger_count": 70, "hit_1": 42, "hit_2": 53, "hit_3": 62, "miss_1": 28, "miss_2": 17, "miss_3": 8}, {"id": 9, "name": "规则9: 百位=5 → 包含胆码4或7", "trigger_count": 72, "hit_1": 43, "hit_2": 57, "hit_3": 62, "miss_1": 29, "miss_2": 15, "miss_3": 10}];
+
+// 每条规则最近10条触发记录
+const RULE_DETAILED_LIGHT = {"1": [{"trigger_period": "2026011", "trigger_num": "647", "next_nums": ["241", "513", "050"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026020", "trigger_num": "676", "next_nums": ["559", "678", "784"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026022", "trigger_num": "678", "next_nums": ["784", "911", "029"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026048", "trigger_num": "612", "next_nums": ["110", "689", "302"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026050", "trigger_num": "689", "next_nums": ["302", "277", "755"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026064", "trigger_num": "604", "next_nums": ["057", "934", "695"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026067", "trigger_num": "695", "next_nums": ["706", "908", "484"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026088", "trigger_num": "608", "next_nums": ["922", "816", "537"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026096", "trigger_num": "689", "next_nums": ["818", "513", "877"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026103", "trigger_num": "661", "next_nums": [], "hit_1": false, "hit_2": false, "hit_3": false}], "2": [{"trigger_period": "2025346", "trigger_num": "897", "next_nums": ["192", "278", "743"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026042", "trigger_num": "854", "next_nums": ["765", "589", "181"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026075", "trigger_num": "816", "next_nums": ["863", "112", "049"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026076", "trigger_num": "863", "next_nums": ["112", "049", "233"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026080", "trigger_num": "802", "next_nums": ["827", "942", "506"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026081", "trigger_num": "827", "next_nums": ["942", "506", "456"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026090", "trigger_num": "816", "next_nums": ["537", "870", "518"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026092", "trigger_num": "870", "next_nums": ["518", "418", "022"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026099", "trigger_num": "877", "next_nums": ["414", "584", "420"], "hit_1": false, "hit_2": true, "hit_3": true}], "3": [{"trigger_period": "2026017", "trigger_num": "945", "next_nums": ["494", "223", "676"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026024", "trigger_num": "911", "next_nums": ["029", "099", "126"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026041", "trigger_num": "901", "next_nums": ["854", "765", "589"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026047", "trigger_num": "936", "next_nums": ["612", "110", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026060", "trigger_num": "943", "next_nums": ["429", "294", "517"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026066", "trigger_num": "934", "next_nums": ["695", "706", "908"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026069", "trigger_num": "908", "next_nums": ["484", "261", "245"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026082", "trigger_num": "942", "next_nums": ["506", "456", "118"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026089", "trigger_num": "922", "next_nums": ["816", "537", "870"], "hit_1": false, "hit_2": false, "hit_3": false}], "4": [{"trigger_period": "2025303", "trigger_num": "933", "next_nums": ["471", "310", "697"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2025318", "trigger_num": "430", "next_nums": ["294", "121", "847"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2025340", "trigger_num": "130", "next_nums": ["996", "681", "645"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2025345", "trigger_num": "630", "next_nums": ["897", "192", "278"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026015", "trigger_num": "532", "next_nums": ["582", "945", "494"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026030", "trigger_num": "134", "next_nums": ["142", "452", "119"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026047", "trigger_num": "936", "next_nums": ["612", "110", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026066", "trigger_num": "934", "next_nums": ["695", "706", "908"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026079", "trigger_num": "233", "next_nums": ["802", "827", "942"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026091", "trigger_num": "537", "next_nums": ["870", "518", "418"], "hit_1": false, "hit_2": false, "hit_3": false}], "5": [{"trigger_period": "2026041", "trigger_num": "901", "next_nums": ["854", "765", "589"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026051", "trigger_num": "302", "next_nums": ["277", "755", "217"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026055", "trigger_num": "107", "next_nums": ["477", "264", "543"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026064", "trigger_num": "604", "next_nums": ["057", "934", "695"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026068", "trigger_num": "706", "next_nums": ["908", "484", "261"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026069", "trigger_num": "908", "next_nums": ["484", "261", "245"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026073", "trigger_num": "504", "next_nums": ["487", "816", "863"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026080", "trigger_num": "802", "next_nums": ["827", "942", "506"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026083", "trigger_num": "506", "next_nums": ["456", "118", "382"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026088", "trigger_num": "608", "next_nums": ["922", "816", "537"], "hit_1": true, "hit_2": true, "hit_3": true}], "6": [{"trigger_period": "2026077", "trigger_num": "112", "next_nums": ["049", "233", "802"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026079", "trigger_num": "233", "next_nums": ["802", "827", "942"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026085", "trigger_num": "118", "next_nums": ["382", "911", "608"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026089", "trigger_num": "922", "next_nums": ["816", "537", "870"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026095", "trigger_num": "022", "next_nums": ["689", "818", "513"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026099", "trigger_num": "877", "next_nums": ["414", "584", "420"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026100", "trigger_num": "414", "next_nums": ["584", "420", "661"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026103", "trigger_num": "661", "next_nums": [], "hit_1": false, "hit_2": false, "hit_3": false}], "7": [{"trigger_period": "2026075", "trigger_num": "816", "next_nums": ["863", "112", "049"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026077", "trigger_num": "112", "next_nums": ["049", "233", "802"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026085", "trigger_num": "118", "next_nums": ["382", "911", "608"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026090", "trigger_num": "816", "next_nums": ["537", "870", "518"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026093", "trigger_num": "518", "next_nums": ["418", "022", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026094", "trigger_num": "418", "next_nums": ["022", "689", "818"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026098", "trigger_num": "513", "next_nums": ["877", "414", "584"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026100", "trigger_num": "414", "next_nums": ["584", "420", "661"], "hit_1": true, "hit_2": true, "hit_3": true}], "8": [{"trigger_period": "2025335", "trigger_num": "051", "next_nums": ["641", "876", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026004", "trigger_num": "019", "next_nums": ["476", "244", "353"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026014", "trigger_num": "050", "next_nums": ["532", "582", "945"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026025", "trigger_num": "029", "next_nums": ["099", "126", "270"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026026", "trigger_num": "099", "next_nums": ["126", "270", "003"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026029", "trigger_num": "003", "next_nums": ["134", "142", "452"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026034", "trigger_num": "052", "next_nums": ["213", "762", "420"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026065", "trigger_num": "057", "next_nums": ["934", "695", "706"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026078", "trigger_num": "049", "next_nums": ["233", "802", "827"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026095", "trigger_num": "022", "next_nums": ["689", "818", "513"], "hit_1": false, "hit_2": false, "hit_3": true}], "9": [{"trigger_period": "2026021", "trigger_num": "559", "next_nums": ["678", "784", "911"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026044", "trigger_num": "589", "next_nums": ["181", "291", "936"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026058", "trigger_num": "543", "next_nums": ["794", "943", "429"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026063", "trigger_num": "517", "next_nums": ["604", "057", "934"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026073", "trigger_num": "504", "next_nums": ["487", "816", "863"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026083", "trigger_num": "506", "next_nums": ["456", "118", "382"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026091", "trigger_num": "537", "next_nums": ["870", "518", "418"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026093", "trigger_num": "518", "next_nums": ["418", "022", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026098", "trigger_num": "513", "next_nums": ["877", "414", "584"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026101", "trigger_num": "584", "next_nums": ["420", "661"], "hit_1": true, "hit_2": true, "hit_3": true}]};
+
 
 function pad3(n) { return String(n).padStart(3, '0'); }
 
@@ -588,10 +787,12 @@ function copyResults() {
 }
 
 function exportCSV() {
-  let csv = '号码,类型,跨度,和值\n';
+  let csv = '号码,类型,跨度,和值
+';
   currentNumbers.forEach(n => {
     const t = n.type==='z6'?'组六':n.type==='z3'?'组三':'豹子';
-    csv += `${n.num},${t},${n.span},${n.sum}\n`;
+    csv += `${n.num},${t},${n.span},${n.sum}
+`;
   });
   const blob = new Blob(['\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
@@ -985,6 +1186,91 @@ function matchWanneng() {
 
 // ==================== 3D数据看板 ====================
 
+
+// ==================== 预测验证 ====================
+
+let PREDICTION = null;
+
+function checkPrediction() {
+  const b = parseInt(document.getElementById('pred-bai').value);
+  const s = parseInt(document.getElementById('pred-shi').value);
+  const g = parseInt(document.getElementById('pred-ge').value);
+
+  if ([b,s,g].some(v => isNaN(v) || v < 0 || v > 9)) {
+    alert('请输入0-9的有效数字'); return;
+  }
+
+  PREDICTION = { bai: b, shi: s, ge: g };
+  renderHistoryWithCheck();
+
+  // Summary
+  const reversed = [...LOTTERY_DATA].reverse();
+  let correctBai = 0, correctShi = 0, correctGe = 0, correctAll = 0;
+  reversed.forEach(d => {
+    if (d.bai === b) correctBai++;
+    if (d.shi === s) correctShi++;
+    if (d.ge === g) correctGe++;
+    if (d.bai === b && d.shi === s && d.ge === g) correctAll++;
+  });
+
+  const summary = document.getElementById('pred-summary');
+  summary.classList.remove('hidden');
+  summary.innerHTML = `
+    <span class="font-bold text-white">预测号码: ${b}${s}${g}</span>
+    <span class="ml-4 text-blue-400">百位正确: ${correctBai}期</span>
+    <span class="ml-3 text-purple-400">十位正确: ${correctShi}期</span>
+    <span class="ml-3 text-green-400">个位正确: ${correctGe}期</span>
+    <span class="ml-3 text-orange-400">全中: ${correctAll}期</span>
+    <span class="ml-3 text-slate-500">(${((correctAll/LOTTERY_DATA.length)*100).toFixed(1)}%)</span>
+  `;
+}
+
+function clearPrediction() {
+  PREDICTION = null;
+  document.getElementById('pred-bai').value = '';
+  document.getElementById('pred-shi').value = '';
+  document.getElementById('pred-ge').value = '';
+  document.getElementById('pred-summary').classList.add('hidden');
+  renderHistoryWithCheck();
+}
+
+function renderHistoryWithCheck() {
+  const historyGrid = document.getElementById('history-grid');
+  const reversed = [...LOTTERY_DATA].reverse();
+
+  historyGrid.innerHTML = reversed.map(d => {
+    const n = d.num;
+    const type = n[0]===n[1] && n[1]===n[2] ? 'bz' : n[0]===n[1] || n[1]===n[2] || n[0]===n[2] ? 'z3' : 'z6';
+    const typeColors = { z6: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+                         z3: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+                         bz: 'text-orange-400 border-orange-500/30 bg-orange-500/10' };
+    const label = type==='z6'?'组六':type==='z3'?'组三':'豹子';
+
+    let markHtml = '';
+    if (PREDICTION) {
+      const marks = [];
+      if (d.bai === PREDICTION.bai) marks.push('百');
+      if (d.shi === PREDICTION.shi) marks.push('十');
+      if (d.ge === PREDICTION.ge) marks.push('个');
+      if (marks.length > 0) {
+        markHtml = `<div class="absolute -top-1 -right-1 w-4 h-4 rounded-full ${marks.length===3?'bg-orange-500':'bg-green-500'} flex items-center justify-center text-[8px] text-white font-bold">${marks.length}</div>`;
+      }
+    }
+
+    const digitColors = PREDICTION ? [
+      d.bai === PREDICTION.bai ? 'text-blue-400' : 'text-slate-500',
+      d.shi === PREDICTION.shi ? 'text-purple-400' : 'text-slate-500',
+      d.ge === PREDICTION.ge ? 'text-green-400' : 'text-slate-500'
+    ] : ['text-white','text-white','text-white'];
+
+    return `<div class="${typeColors[type]} border rounded-lg px-2 py-1.5 text-center text-xs cursor-default hover:brightness-110 transition-all relative" title="期号${d.issue} ${label}${PREDICTION ? (d.bai===PREDICTION.bai&&d.shi===PREDICTION.shi&&d.ge===PREDICTION.ge?' 全中!':'') : ''}">
+      ${markHtml}
+      <div class="font-bold text-sm font-mono"><span class="${digitColors[0]}">${n[0]}</span><span class="${digitColors[1]}">${n[1]}</span><span class="${digitColors[2]}">${n[2]}</span></div>
+      <div class="text-[10px] opacity-70">${d.issue}</div>
+    </div>`;
+  }).join('');
+}
+
 function init3DDataPanel() {
   // Basic info
   document.getElementById('latest-issue').textContent = LATEST_ISSUE;
@@ -1075,29 +1361,388 @@ function init3DDataPanel() {
     </tr>
   `).join('');
 
-  // History grid (all data, reversed newest first)
-  const historyGrid = document.getElementById('history-grid');
-  const reversed = [...LOTTERY_DATA].reverse();
-  historyGrid.innerHTML = reversed.map(d => {
-    const n = d.num;
-    const type = n[0]===n[1] && n[1]===n[2] ? 'bz' : n[0]===n[1] || n[1]===n[2] || n[0]===n[2] ? 'z3' : 'z6';
-    const typeColors = { z6: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
-                         z3: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
-                         bz: 'text-orange-400 border-orange-500/30 bg-orange-500/10' };
-    const label = type==='z6'?'组六':type==='z3'?'组三':'豹子';
-    return `<div class="${typeColors[type]} border rounded-lg px-2 py-1.5 text-center text-xs cursor-default hover:brightness-110 transition-all" title="期号${d.issue} ${label}">
-      <div class="font-bold text-sm font-mono">${n}</div>
-      <div class="text-[10px] opacity-70">${d.issue}</div>
-    </div>`;
+  // History grid
+  renderHistoryWithCheck();
+
+  // ===== 任两码和差预测 =====
+  renderLiangmaPrediction();
+}
+
+function renderLiangmaPrediction() {
+  // For each period i (starting from index 3), use periods i-3, i-2, i-1 to predict
+  // Prediction = (bai_sum % 10, shi_sum % 10, ge_sum % 10)
+  // Then check if any prediction value matches the actual liangma of period i
+
+  const results = [];
+  for (let i = 3; i < LOTTERY_DATA.length; i++) {
+    const d1 = LOTTERY_DATA[i-3];
+    const d2 = LOTTERY_DATA[i-2];
+    const d3 = LOTTERY_DATA[i-1];
+    const actual = LOTTERY_DATA[i];
+
+    // Predicted values (same logic as trend analysis)
+    const predBai = (d1.bai + d2.bai + d3.bai) % 10;
+    const predShi = (d1.shi + d2.shi + d3.shi) % 10;
+    const predGe = (d1.ge + d2.ge + d3.ge) % 10;
+    const predictions = [predBai, predShi, predGe];
+
+    // Actual liangma values for the actual period (和 + 差)
+    const actualLiangma = [
+      (actual.bai + actual.shi) % 10,
+      (actual.bai + actual.ge) % 10,
+      (actual.shi + actual.ge) % 10,
+      Math.abs(actual.bai - actual.shi),
+      Math.abs(actual.bai - actual.ge),
+      Math.abs(actual.shi - actual.ge)
+    ];
+
+    // Check if any prediction matches any actual liangma
+    const hits = predictions.filter(p => actualLiangma.includes(p));
+    const isHit = hits.length > 0;
+
+    results.push({
+      issue: actual.issue,
+      num: actual.num,
+      actualLiangma: actualLiangma,
+      predictions: predictions,
+      hits: hits,
+      isHit: isHit
+    });
+  }
+
+  // Next prediction (based on last 3 periods)
+  const last3 = LOTTERY_DATA.slice(-3);
+  const nextPred = [
+    (last3[0].bai + last3[1].bai + last3[2].bai) % 10,
+    (last3[0].shi + last3[1].shi + last3[2].shi) % 10,
+    (last3[0].ge + last3[1].ge + last3[2].ge) % 10
+  ];
+
+  // Render next prediction
+  const nextContainer = document.getElementById('liangma-next-pred');
+  nextContainer.innerHTML = nextPred.map((v, i) => {
+    const label = i === 0 ? '百位和尾' : i === 1 ? '十位和尾' : '个位和尾';
+    return `<span class="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold font-mono">${label}: ${v}</span>`;
+  }).join('');
+
+  const nextDetail = document.getElementById('liangma-next-detail');
+  nextDetail.innerHTML = `
+    百位: ${last3[0].bai}+${last3[1].bai}+${last3[2].bai}=${last3[0].bai+last3[1].bai+last3[2].bai} → 尾${nextPred[0]} |
+    十位: ${last3[0].shi}+${last3[1].shi}+${last3[2].shi}=${last3[0].shi+last3[1].shi+last3[2].shi} → 尾${nextPred[1]} |
+    个位: ${last3[0].ge}+${last3[1].ge}+${last3[2].ge}=${last3[0].ge+last3[1].ge+last3[2].ge} → 尾${nextPred[2]}
+  `;
+
+  // Render verification table (last 30 results, reversed = newest first)
+  const tableBody = document.getElementById('liangma-verify-table');
+  const displayResults = [...results].reverse().slice(0, 30);
+  tableBody.innerHTML = displayResults.map(r => {
+    const predStr = r.predictions.join(', ');
+    const actualStr = r.actualLiangma.join(', ');
+    const hitStr = r.hits.length > 0 ? r.hits.join(', ') : '-';
+    return `<tr class="border-b border-slate-800 ${r.isHit ? '' : 'opacity-60'}">
+      <td class="py-2 font-mono text-xs">${r.issue}</td>
+      <td class="text-center font-bold text-white">${r.num.split('').join(' ')}</td>
+      <td class="text-center font-mono text-blue-400">${r.actualLiangma[0]}</td>
+      <td class="text-center font-mono text-purple-400">${r.actualLiangma[1]}</td>
+      <td class="text-center font-mono text-green-400">${r.actualLiangma[2]}</td>
+      <td class="text-center font-mono text-orange-400">${r.actualLiangma[3]}</td>
+      <td class="text-center font-mono text-pink-400">${r.actualLiangma[4]}</td>
+      <td class="text-center font-mono text-yellow-400">${r.actualLiangma[5]}</td>
+      <td class="text-center font-mono text-xs text-slate-400">${predStr}</td>
+      <td class="text-center">
+        ${r.isHit
+          ? `<span class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-bold">✓ 命中${r.hits.length}个</span>`
+          : `<span class="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs font-bold">✗ 未命中</span>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Summary stats
+  const total = results.length;
+  const hits = results.filter(r => r.isHit).length;
+  const hitRate = (hits / total * 100).toFixed(1);
+  const hit1 = results.filter(r => r.hits.length === 1).length;
+  const hit2 = results.filter(r => r.hits.length === 2).length;
+  const hit3 = results.filter(r => r.hits.length === 3).length;
+
+  document.getElementById('liangma-summary').innerHTML = `
+    <span class="font-bold text-white">历史验证统计：</span>
+    共验证 ${total} 期，命中 ${hits} 期（命中率 ${hitRate}%）
+    | 命中1个: ${hit1}期 | 命中2个: ${hit2}期 | 命中3个: ${hit3}期
+    <br><span class="text-slate-500">预测值 = 前3期同位置数字之和的个位数，验证 = 预测值是否出现在当期开奖号任两码之和或之差的个位数中（和差共6个值）</span>
+  `;
+}
+
+
+// ==================== 规则统计面板 ====================
+
+function getRating(rate) {
+  if (rate >= 85) return { label: 'S', color: 'text-green-400', bg: 'bg-green-500/20' };
+  if (rate >= 70) return { label: 'A', color: 'text-blue-400', bg: 'bg-blue-500/20' };
+  if (rate >= 55) return { label: 'B', color: 'text-yellow-400', bg: 'bg-yellow-500/20' };
+  if (rate >= 40) return { label: 'C', color: 'text-orange-400', bg: 'bg-orange-500/20' };
+  return { label: 'D', color: 'text-red-400', bg: 'bg-red-500/20' };
+}
+
+function renderRuleStats() {
+  const tbody = document.getElementById('rule-stats-table');
+  tbody.innerHTML = RULE_STATS_806.map(stat => {
+    const tc = stat.trigger_count;
+    const r1 = tc ? (stat.hit_1 / tc * 100).toFixed(1) : 0;
+    const r2 = tc ? (stat.hit_2 / tc * 100).toFixed(1) : 0;
+    const r3 = tc ? (stat.hit_3 / tc * 100).toFixed(1) : 0;
+    const rating = getRating(parseFloat(r3));
+    return `<tr class="border-b border-slate-800 hover:bg-slate-800/30">
+      <td class="py-2 text-xs">${stat.name}</td>
+      <td class="text-center font-mono">${tc}</td>
+      <td class="text-center text-green-400">${stat.hit_1}</td>
+      <td class="text-center text-red-400">${stat.miss_1}</td>
+      <td class="text-center font-bold">${r1}%</td>
+      <td class="text-center text-green-400">${stat.hit_2}</td>
+      <td class="text-center">${r2}%</td>
+      <td class="text-center text-green-400">${stat.hit_3}</td>
+      <td class="text-center font-bold">${r3}%</td>
+      <td class="text-center"><span class="px-2 py-0.5 rounded text-xs font-bold ${rating.bg} ${rating.color}">${rating.label}</span></td>
+    </tr>`;
   }).join('');
 }
 
+// 规则编辑器配置（可编辑参数）
+let CUSTOM_RULES = [
+  { id: 1, name: '百位定后两位', triggerPos: 'bai', triggerVal: 6, targetType: 'back2', targetVals: [50,51,53], desc: '百位=X → 后两位∈{A,B,C}' },
+  { id: 2, name: '百位定胆码', triggerPos: 'bai', triggerVal: 8, targetType: 'contains', targetVals: [5], desc: '百位=X → 包含胆码Y' },
+  { id: 3, name: '百位定胆码2', triggerPos: 'bai', triggerVal: 9, targetType: 'contains', targetVals: [2], desc: '百位=X → 包含胆码Y' },
+  { id: 4, name: '十位定胆码', triggerPos: 'shi', triggerVal: 3, targetType: 'containsAny', targetVals: [2,9], desc: '十位=X → 包含胆码Y或Z' },
+  { id: 5, name: '十位出组三', triggerPos: 'shi', triggerVal: 0, targetType: 'zusan', targetVals: [], desc: '十位=X → 出现组三' },
+  { id: 6, name: '组三定跨度', triggerPos: 'type', triggerVal: 'zusan', targetType: 'span', targetVals: [9], desc: '出现组三 → 跨度=Y' },
+  { id: 7, name: '十位冷码回补', triggerPos: 'shi', triggerVal: 1, targetType: 'contains', targetVals: [8], desc: '十位=X → 冷码Y回补' },
+  { id: 8, name: '百位定胆码复合', triggerPos: 'bai', triggerVal: 0, targetType: 'containsOrPos', targetVals: [4,5], orPos: 'shi', orVal: 5, desc: '百位=X → 含胆码Y或Z,或十位=W' },
+  { id: 9, name: '百位定胆码双', triggerPos: 'bai', triggerVal: 5, targetType: 'containsAny', targetVals: [4,7], desc: '百位=X → 包含胆码Y或Z' }
+];
+
+function initRuleEditor() {
+  const container = document.getElementById('rule-editor-list');
+  container.innerHTML = CUSTOM_RULES.map((rule, idx) => {
+    let inputs = '';
+    if (rule.targetType === 'back2') {
+      inputs = `<input type="number" id="ed-tv-${rule.id}" value="${rule.triggerVal}" class="w-12 px-1 py-1 rounded text-center text-xs"> → 后两位∈ <input type="text" id="ed-tg-${rule.id}" value="${rule.targetVals.join(',')}" class="w-24 px-1 py-1 rounded text-xs">`;
+    } else if (rule.targetType === 'contains') {
+      inputs = `<input type="number" id="ed-tv-${rule.id}" value="${rule.triggerVal}" class="w-12 px-1 py-1 rounded text-center text-xs"> → 包含胆码 <input type="number" id="ed-tg-${rule.id}" value="${rule.targetVals[0]}" class="w-12 px-1 py-1 rounded text-center text-xs">`;
+    } else if (rule.targetType === 'containsAny') {
+      inputs = `<input type="number" id="ed-tv-${rule.id}" value="${rule.triggerVal}" class="w-12 px-1 py-1 rounded text-center text-xs"> → 包含胆码 <input type="text" id="ed-tg-${rule.id}" value="${rule.targetVals.join('或')}" class="w-20 px-1 py-1 rounded text-xs">`;
+    } else if (rule.targetType === 'zusan') {
+      inputs = `<input type="number" id="ed-tv-${rule.id}" value="${rule.triggerVal}" class="w-12 px-1 py-1 rounded text-center text-xs"> → 出现组三`;
+    } else if (rule.targetType === 'span') {
+      inputs = `出现组三 → 跨度=<input type="number" id="ed-tg-${rule.id}" value="${rule.targetVals[0]}" class="w-12 px-1 py-1 rounded text-center text-xs">`;
+    } else if (rule.targetType === 'containsOrPos') {
+      inputs = `<input type="number" id="ed-tv-${rule.id}" value="${rule.triggerVal}" class="w-12 px-1 py-1 rounded text-center text-xs"> → 含胆码<input type="text" id="ed-tg-${rule.id}" value="${rule.targetVals.join('或')}" class="w-16 px-1 py-1 rounded text-xs"> 或十位=<input type="number" id="ed-or-${rule.id}" value="${rule.orVal}" class="w-12 px-1 py-1 rounded text-center text-xs">`;
+    }
+    const posLabel = { bai: '百位', shi: '十位', ge: '个位', type: '类型' }[rule.triggerPos] || rule.triggerPos;
+    return `<div class="flex items-center gap-2 text-sm">
+      <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400">${rule.id}</span>
+      <span class="text-slate-400 text-xs w-12">${posLabel}=</span>
+      ${inputs}
+    </div>`;
+  }).join('');
+
+  // Init record rule select
+  const sel = document.getElementById('record-rule-select');
+  sel.innerHTML = '<option value="">选择规则...</option>' + RULE_STATS_806.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+}
+
+function runCustomRuleValidation() {
+  // Read edited values
+  const rules = CUSTOM_RULES.map(rule => {
+    const r = { ...rule };
+    const tv = document.getElementById(`ed-tv-${rule.id}`);
+    if (tv) r.triggerVal = parseInt(tv.value);
+    const tg = document.getElementById(`ed-tg-${rule.id}`);
+    if (tg) {
+      if (rule.targetType === 'back2') {
+        r.targetVals = tg.value.split(/[,，]/).map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      } else if (rule.targetType === 'containsAny') {
+        r.targetVals = tg.value.split(/[或|]/).map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      } else if (rule.targetType === 'containsOrPos') {
+        r.targetVals = tg.value.split(/[或|]/).map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+        const orv = document.getElementById(`ed-or-${rule.id}`);
+        if (orv) r.orVal = parseInt(orv.value);
+      } else {
+        r.targetVals = [parseInt(tg.value)];
+      }
+    }
+    return r;
+  });
+
+  // Validate on HISTORY_806
+  const data = HISTORY_806.map(d => {
+    const n = d.number;
+    return { period: d.period, num: n, b: parseInt(n[0]), s: parseInt(n[1]), g: parseInt(n[2]) };
+  });
+
+  const results = rules.map(rule => {
+    let tc = 0, h1 = 0, h2 = 0, h3 = 0;
+    for (let i = 0; i < data.length; i++) {
+      const c = data[i];
+      let triggered = false;
+      if (rule.triggerPos === 'bai' && c.b === rule.triggerVal) triggered = true;
+      if (rule.triggerPos === 'shi' && c.s === rule.triggerVal) triggered = true;
+      if (rule.triggerPos === 'ge' && c.g === rule.triggerVal) triggered = true;
+      if (rule.triggerPos === 'type') {
+        const isZusan = (c.b === c.s || c.s === c.g || c.b === c.g) && !(c.b === c.s && c.s === c.g);
+        if (rule.triggerVal === 'zusan' && isZusan) triggered = true;
+      }
+
+      if (triggered) {
+        tc++;
+        let hit1 = false, hit2 = false, hit3 = false;
+        const checkTarget = (item) => {
+          if (rule.targetType === 'back2') {
+            return rule.targetVals.includes(item.s * 10 + item.g);
+          }
+          if (rule.targetType === 'contains') {
+            return [item.b, item.s, item.g].includes(rule.targetVals[0]);
+          }
+          if (rule.targetType === 'containsAny') {
+            return rule.targetVals.some(v => [item.b, item.s, item.g].includes(v));
+          }
+          if (rule.targetType === 'zusan') {
+            return (item.b === item.s || item.s === item.g || item.b === item.g) && !(item.b === item.s && item.s === item.g);
+          }
+          if (rule.targetType === 'span') {
+            return Math.max(item.b, item.s, item.g) - Math.min(item.b, item.s, item.g) === rule.targetVals[0];
+          }
+          if (rule.targetType === 'containsOrPos') {
+            return rule.targetVals.some(v => [item.b, item.s, item.g].includes(v)) || item.s === rule.orVal;
+          }
+          return false;
+        };
+        if (i + 1 < data.length) hit1 = checkTarget(data[i+1]);
+        if (i + 2 < data.length) hit2 = hit1 || checkTarget(data[i+2]);
+        else hit2 = hit1;
+        if (i + 3 < data.length) hit3 = hit2 || checkTarget(data[i+3]);
+        else hit3 = hit2;
+        if (hit1) h1++;
+        if (hit2) h2++;
+        if (hit3) h3++;
+      }
+    }
+    return { ...rule, trigger_count: tc, hit_1: h1, hit_2: h2, hit_3: h3 };
+  });
+
+  // Render
+  const container = document.getElementById('custom-validation-results');
+  container.classList.remove('hidden');
+  const tbody = document.getElementById('custom-validation-table');
+  tbody.innerHTML = results.map(r => {
+    const tc = r.trigger_count;
+    const r1 = tc ? (r.hit_1 / tc * 100).toFixed(1) : 0;
+    const r2 = tc ? (r.hit_2 / tc * 100).toFixed(1) : 0;
+    const r3 = tc ? (r.hit_3 / tc * 100).toFixed(1) : 0;
+    const rating = getRating(parseFloat(r3));
+    return `<tr class="border-b border-slate-800">
+      <td class="py-2 text-xs">${r.desc}</td>
+      <td class="text-center font-mono">${tc}</td>
+      <td class="text-center text-green-400">${r.hit_1}</td>
+      <td class="text-center font-bold">${r1}%</td>
+      <td class="text-center text-green-400">${r.hit_2}</td>
+      <td class="text-center">${r2}%</td>
+      <td class="text-center text-green-400">${r.hit_3}</td>
+      <td class="text-center font-bold">${r3}%</td>
+      <td class="text-center"><span class="px-2 py-0.5 rounded text-xs font-bold ${rating.bg} ${rating.color}">${rating.label}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Scroll to results
+  container.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetRules() {
+  CUSTOM_RULES = [
+    { id: 1, name: '百位定后两位', triggerPos: 'bai', triggerVal: 6, targetType: 'back2', targetVals: [50,51,53], desc: '百位=6 → 后两位∈{50,51,53}' },
+    { id: 2, name: '百位定胆码', triggerPos: 'bai', triggerVal: 8, targetType: 'contains', targetVals: [5], desc: '百位=8 → 包含胆码5' },
+    { id: 3, name: '百位定胆码2', triggerPos: 'bai', triggerVal: 9, targetType: 'contains', targetVals: [2], desc: '百位=9 → 包含胆码2' },
+    { id: 4, name: '十位定胆码', triggerPos: 'shi', triggerVal: 3, targetType: 'containsAny', targetVals: [2,9], desc: '十位=3 → 包含胆码2或9' },
+    { id: 5, name: '十位出组三', triggerPos: 'shi', triggerVal: 0, targetType: 'zusan', targetVals: [], desc: '十位=0 → 出现组三' },
+    { id: 6, name: '组三定跨度', triggerPos: 'type', triggerVal: 'zusan', targetType: 'span', targetVals: [9], desc: '出现组三 → 跨度=9' },
+    { id: 7, name: '十位冷码回补', triggerPos: 'shi', triggerVal: 1, targetType: 'contains', targetVals: [8], desc: '十位=1 → 冷码8回补' },
+    { id: 8, name: '百位定胆码复合', triggerPos: 'bai', triggerVal: 0, targetType: 'containsOrPos', targetVals: [4,5], orPos: 'shi', orVal: 5, desc: '百位=0 → 含胆码4或5,或十位=5' },
+    { id: 9, name: '百位定胆码双', triggerPos: 'bai', triggerVal: 5, targetType: 'containsAny', targetVals: [4,7], desc: '百位=5 → 包含胆码4或7' }
+  ];
+  initRuleEditor();
+  document.getElementById('custom-validation-results').classList.add('hidden');
+}
+
+function showRuleRecords() {
+  const sel = document.getElementById('record-rule-select');
+  const ruleId = sel.value;
+  const panel = document.getElementById('detailed-records-panel');
+  if (!ruleId) { panel.classList.add('hidden'); return; }
+
+  panel.classList.remove('hidden');
+  const tbody = document.getElementById('rule-records-table');
+  const records = RULE_DETAILED_LIGHT[ruleId] || [];
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-4">暂无记录</td></tr>';
+    return;
+  }
+  tbody.innerHTML = records.map(r => {
+    const h1c = r.hit_1 ? 'text-green-400' : 'text-red-400';
+    const h2c = r.hit_2 ? 'text-green-400' : 'text-red-400';
+    const h3c = r.hit_3 ? 'text-green-400' : 'text-red-400';
+    const h1t = r.hit_1 ? '是' : '否';
+    const h2t = r.hit_2 ? '是' : '否';
+    const h3t = r.hit_3 ? '是' : '否';
+    return `<tr class="border-b border-slate-800">
+      <td class="py-2 font-mono text-xs">${r.trigger_period}</td>
+      <td class="text-center font-bold">${r.trigger_num}</td>
+      <td class="text-center text-slate-400 text-xs">${r.next_nums.join(' / ')}</td>
+      <td class="text-center ${h1c} font-bold">${h1t}</td>
+      <td class="text-center ${h2c}">${h2t}</td>
+      <td class="text-center ${h3c}">${h3t}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportRuleStats() {
+  let csv = '规则,触发次数,1期命中,1期遗漏,1期命中率,2期命中,2期遗漏,2期命中率,3期命中,3期遗漏,3期命中率\
+';
+  RULE_STATS_806.forEach(stat => {
+    const tc = stat.trigger_count;
+    csv += `"${stat.name}",${tc},${stat.hit_1},${stat.miss_1},${(stat.hit_1/tc*100).toFixed(1)}%,${stat.hit_2},${stat.miss_2},${(stat.hit_2/tc*100).toFixed(1)}%,${stat.hit_3},${stat.miss_3},${(stat.hit_3/tc*100).toFixed(1)}%\
+`;
+  });
+  const blob = new Blob(['\\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '规则统计_806期.csv';
+  link.click();
+}
+
+function exportDetailedRecords() {
+  // Build CSV from RULE_DETAILED_LIGHT + RULE_STATS_806 names
+  let csv = '规则ID,规则名称,触发期号,触发号码,下期1,下期2,下期3,1期命中,2期命中,3期命中\
+';
+  for (const ruleId in RULE_DETAILED_LIGHT) {
+    const ruleName = RULE_STATS_806.find(s => s.id == ruleId)?.name || '';
+    (RULE_DETAILED_LIGHT[ruleId] || []).forEach(r => {
+      csv += `${ruleId},"${ruleName}",${r.trigger_period},${r.trigger_num},${r.next_nums[0]||''},${r.next_nums[1]||''},${r.next_nums[2]||''},${r.hit_1?'是':'否'},${r.hit_2?'是':'否'},${r.hit_3?'是':'否'}\
+`;
+    });
+  }
+  const blob = new Blob(['\\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '规则详细触发记录_806期.csv';
+  link.click();
+}
 
 // ==================== 初始化 ====================
 
 document.addEventListener('DOMContentLoaded', () => {
   // 初始化3D数据看板
   init3DDataPanel();
+
   // 初始化号码生成器
   generateNumbers();
 
@@ -1110,11 +1755,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化万能组合
   initWanneng();
 
+  // 初始化规则统计面板
+  renderRuleStats();
+  initRuleEditor();
+
   // 输入框回车触发
   document.getElementById('dan-input')?.addEventListener('keypress', e => { if(e.key==='Enter') predictDan(); });
   document.getElementById('seven-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchSeven(); });
   document.getElementById('wn-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchWanneng(); });
   document.getElementById('span-input')?.addEventListener('keypress', e => { if(e.key==='Enter') analyzeSpan(); });
+  ['pred-bai','pred-shi','pred-ge'].forEach(id => {
+    document.getElementById(id)?.addEventListener('keypress', e => { if(e.key==='Enter') checkPrediction(); });
+  });
 
   ['trend-h1','trend-h2','trend-h3'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', function() {
