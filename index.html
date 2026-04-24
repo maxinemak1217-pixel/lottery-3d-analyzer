@@ -818,12 +818,19 @@ function analyzeTrend() {
   const sTail = tail(n1[1] + n2[1] + n3[1]);
   const gTail = tail(n1[2] + n2[2] + n3[2]);
 
-  // 任两码和差 (三个尾数)
-  let diffs = [bTail, sTail, gTail];
-  let extraDiffs = [];
-  if (bTail === sTail) extraDiffs.push(tail(bTail + sTail));
-  if (bTail === gTail) extraDiffs.push(tail(bTail + gTail));
-  if (sTail === gTail) extraDiffs.push(tail(sTail + gTail));
+  // 基础预测值 = 三个和尾
+  const baseTails = [bTail, sTail, gTail];
+
+  // 重复和差：统计每个和尾出现次数，出现>=2次的，该数字自加取个位作为新增和差
+  const tailCounts = {};
+  baseTails.forEach(v => tailCounts[v] = (tailCounts[v] || 0) + 1);
+  const extraDiffs = [];
+  Object.entries(tailCounts).forEach(([val, count]) => {
+    if (count >= 2) extraDiffs.push(tail(parseInt(val) + parseInt(val)));
+  });
+
+  // 最终预测值 = 基础三个和尾 + 重复生成的新增和差
+  const diffs = [...baseTails, ...extraDiffs];
 
   // 跨度走势
   const spans = [span(h1), span(h2), span(h3)];
@@ -1378,11 +1385,21 @@ function renderLiangmaPrediction() {
     const d3 = LOTTERY_DATA[i-1];
     const actual = LOTTERY_DATA[i];
 
-    // Predicted values (same logic as trend analysis)
+    // Predicted values: 三位和尾 + 重复和差
     const predBai = (d1.bai + d2.bai + d3.bai) % 10;
     const predShi = (d1.shi + d2.shi + d3.shi) % 10;
     const predGe = (d1.ge + d2.ge + d3.ge) % 10;
-    const predictions = [predBai, predShi, predGe];
+    const baseTails = [predBai, predShi, predGe];
+
+    // 重复和差：统计每个和尾出现次数，出现>=2次的，该数字自加取个位
+    const tailCounts = {};
+    baseTails.forEach(v => tailCounts[v] = (tailCounts[v] || 0) + 1);
+    const extraDiffs = [];
+    Object.entries(tailCounts).forEach(([val, count]) => {
+      if (count >= 2) extraDiffs.push((parseInt(val) + parseInt(val)) % 10);
+    });
+
+    const predictions = [...baseTails, ...extraDiffs];
 
     // Actual liangma values for the actual period (和 + 差)
     const actualLiangma = [
@@ -1410,24 +1427,34 @@ function renderLiangmaPrediction() {
 
   // Next prediction (based on last 3 periods)
   const last3 = LOTTERY_DATA.slice(-3);
-  const nextPred = [
+  const nextBase = [
     (last3[0].bai + last3[1].bai + last3[2].bai) % 10,
     (last3[0].shi + last3[1].shi + last3[2].shi) % 10,
     (last3[0].ge + last3[1].ge + last3[2].ge) % 10
   ];
 
+  // 重复和差
+  const nextCounts = {};
+  nextBase.forEach(v => nextCounts[v] = (nextCounts[v] || 0) + 1);
+  const nextExtra = [];
+  Object.entries(nextCounts).forEach(([val, count]) => {
+    if (count >= 2) nextExtra.push((parseInt(val) + parseInt(val)) % 10);
+  });
+  const nextPred = [...nextBase, ...nextExtra];
+
   // Render next prediction
   const nextContainer = document.getElementById('liangma-next-pred');
-  nextContainer.innerHTML = nextPred.map((v, i) => {
+  nextContainer.innerHTML = nextBase.map((v, i) => {
     const label = i === 0 ? '百位和尾' : i === 1 ? '十位和尾' : '个位和尾';
     return `<span class="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold font-mono">${label}: ${v}</span>`;
-  }).join('');
+  }).join('') + (nextExtra.length ? nextExtra.map(v => `<span class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-sm font-bold font-mono">${v}（重复和差）</span>`).join('') : '');
 
   const nextDetail = document.getElementById('liangma-next-detail');
   nextDetail.innerHTML = `
-    百位: ${last3[0].bai}+${last3[1].bai}+${last3[2].bai}=${last3[0].bai+last3[1].bai+last3[2].bai} → 尾${nextPred[0]} |
-    十位: ${last3[0].shi}+${last3[1].shi}+${last3[2].shi}=${last3[0].shi+last3[1].shi+last3[2].shi} → 尾${nextPred[1]} |
-    个位: ${last3[0].ge}+${last3[1].ge}+${last3[2].ge}=${last3[0].ge+last3[1].ge+last3[2].ge} → 尾${nextPred[2]}
+    百位: ${last3[0].bai}+${last3[1].bai}+${last3[2].bai}=${last3[0].bai+last3[1].bai+last3[2].bai} → 尾${nextBase[0]} |
+    十位: ${last3[0].shi}+${last3[1].shi}+${last3[2].shi}=${last3[0].shi+last3[1].shi+last3[2].shi} → 尾${nextBase[1]} |
+    个位: ${last3[0].ge}+${last3[1].ge}+${last3[2].ge}=${last3[0].ge+last3[1].ge+last3[2].ge} → 尾${nextBase[2]}
+    ${nextExtra.length ? '| 重复和差: ' + nextExtra.join(', ') : ''}
   `;
 
   // Render verification table (last 30 results, reversed = newest first)
