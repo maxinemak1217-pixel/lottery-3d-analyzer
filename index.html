@@ -829,8 +829,8 @@ function analyzeTrend() {
     if (count >= 2) extraDiffs.push(tail(parseInt(val) + parseInt(val)));
   });
 
-  // 最终预测值 = 基础三个和尾 + 重复生成的新增和差
-  const diffs = [...baseTails, ...extraDiffs];
+  // 最终预测值 = 基础三个和尾 + 重复生成的新增和差（去重）
+  const diffs = [...new Set([...baseTails, ...extraDiffs])];
 
   // 跨度走势
   const spans = [span(h1), span(h2), span(h3)];
@@ -1400,6 +1400,7 @@ function renderLiangmaPrediction() {
     });
 
     const predictions = [...baseTails, ...extraDiffs];
+    const predictionsUnique = [...new Set(predictions)];
 
     // Actual liangma values for the actual period (和 + 差)
     const actualLiangma = [
@@ -1471,14 +1472,14 @@ function renderLiangmaPrediction() {
     <td class="text-center font-mono text-slate-600">--</td>
     <td class="text-center font-mono text-slate-600">--</td>
     <td class="text-center font-mono text-slate-600">--</td>
-    <td class="text-center font-mono text-xs text-yellow-400 font-bold">${nextPred.join(', ')}</td>
+    <td class="text-center font-mono text-xs text-yellow-400 font-bold">${[...new Set(nextPred)].join(', ')}</td>
     <td class="text-center"><span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-bold">待开奖验证</span></td>
   </tr>`;
 
   tableBody.innerHTML = pendingRow + displayResults.map(r => {
-    const predStr = r.predictions.join(', ');
+    const predStr = [...new Set(r.predictions)].join(', ');
     const actualStr = r.actualLiangma.join(', ');
-    const hitStr = r.hits.length > 0 ? r.hits.join(', ') : '-';
+    const hitStr = r.hits.length > 0 ? [...new Set(r.hits)].join(', ') : '-';
     return `<tr class="border-b border-slate-800 ${r.isHit ? '' : 'opacity-60'}">
       <td class="py-2 font-mono text-xs">${r.issue}</td>
       <td class="text-center font-bold text-white">${r.num.split('').join(' ')}</td>
