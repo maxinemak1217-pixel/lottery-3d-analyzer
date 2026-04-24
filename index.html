@@ -328,6 +328,83 @@
           </div>
         </div>
       </div>
+
+      <!-- 第四部分: 断组工具 -->
+      <div class="mt-8">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">✂️ 断组工具（0-9分成三段，预测下期号码分布）</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">输入上期开奖号码，自动生成断组</h4>
+            <div class="space-y-3 mb-4">
+              <div class="flex gap-2">
+                <input type="text" id="duanzu-input" placeholder="如: 487" maxlength="3" class="w-full px-4 py-3 rounded-lg text-lg text-center tracking-[0.5em] font-bold">
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="calcDuanzu('fixed')" class="py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors">固定式断组</button>
+                <button onclick="calcDuanzu('hejiu')" class="py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors">对码和九</button>
+                <button onclick="calcDuanzu('wanneng4')" class="py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-medium transition-colors">万能四码</button>
+              </div>
+            </div>
+            <div id="duanzu-result" class="hidden">
+              <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">断组方式</span>
+                  <span id="dz-method" class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-xs"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500">开奖号</span>
+                  <span id="dz-num" class="font-mono font-bold text-white text-lg"></span>
+                </div>
+                <div class="border-t border-slate-700 pt-3">
+                  <div class="text-xs text-slate-500 mb-2">断组结果（0-9分成三段）</div>
+                  <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <div class="text-[10px] text-blue-400 mb-1">第一段</div>
+                      <div id="dz-g1" class="font-mono font-bold text-blue-300 text-lg tracking-widest"></div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                      <div class="text-[10px] text-purple-400 mb-1">第二段</div>
+                      <div id="dz-g2" class="font-mono font-bold text-purple-300 text-lg tracking-widest"></div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                      <div class="text-[10px] text-teal-400 mb-1">第三段</div>
+                      <div id="dz-g3" class="font-mono font-bold text-teal-300 text-lg tracking-widest"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="border-t border-slate-700 pt-3">
+                  <div class="flex gap-2">
+                    <input type="text" id="dz-verify-input" placeholder="输入下期开奖号验证" maxlength="3" class="w-full px-3 py-2 rounded-lg text-center tracking-[0.5em] font-bold text-sm">
+                    <button onclick="verifyDuanzu()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-medium transition-colors">验证</button>
+                  </div>
+                  <div id="dz-verify-result" class="mt-2 hidden"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs text-slate-500 mb-3">断组方法说明</h4>
+            <div class="space-y-3 text-xs text-slate-300">
+              <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                <div class="font-semibold text-blue-400 mb-1">固定式断组</div>
+                <p class="text-slate-400">开奖号含对码05/16/27/38/49，查映射表得四段后合并为三段。</p>
+                <p class="text-slate-500 mt-1">例：050 → 对码05 → <span class="text-blue-300">349</span>-<span class="text-purple-300">0516</span>-<span class="text-teal-300">278</span></p>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                <div class="font-semibold text-purple-400 mb-1">对码和九断组</div>
+                <p class="text-slate-400">开奖号逐位取对码做第一段，和九配对做第二段，余码为第三段。</p>
+                <p class="text-slate-500 mt-1">例：487 → <span class="text-blue-300">932</span>-<span class="text-purple-300">067</span>-<span class="text-teal-300">1458</span>（816正确）</p>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                <div class="font-semibold text-teal-400 mb-1">万能四码断组</div>
+                <p class="text-slate-400">开奖号+对码=万能四码做第一段，和九配对做第二段，余码第三段。</p>
+                <p class="text-slate-500 mt-1">例：033 → <span class="text-blue-300">0385</span>-<span class="text-purple-300">1246</span>-<span class="text-teal-300">79</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 模块4: 万能七码 -->
@@ -1165,6 +1242,145 @@ function predictDuima() {
   document.getElementById('duima-d1').textContent = map.duima1;
   document.getElementById('duima-d2').textContent = map.duima2;
   document.getElementById('duima-yuou').textContent = map.yuou;
+}
+
+// ==================== 断组工具 ====================
+
+// 对码配对关系
+const DUIMA_PAIR = { '0':'5','5':'0','1':'6','6':'1','2':'7','7':'2','3':'8','8':'3','4':'9','9':'4' };
+
+// 获取数字的对码
+function getDuimaDigit(d) { return DUIMA_PAIR[String(d)]; }
+
+// 和九配对（与某数字相加=9）
+function getHeJiu(d) { return String(9 - parseInt(d)); }
+
+// 固定式断组：基于对码映射表 349-05-16-278
+function duanzuFixed(numStr) {
+  const digits = [...new Set(numStr.split(''))];
+  const pairs = [...new Set(digits.map(d => getDuimaPair(d)))];
+  let pair = pairs[0];
+  // 优先选对子对应的对码
+  const counts = {};
+  digits.forEach(d => counts[d] = (counts[d]||0)+1);
+  const duizi = Object.entries(counts).find(([d,c]) => c >= 2);
+  if (duizi) pair = getDuimaPair(duizi[0]);
+  const map = DUIMA_MAP[pair];
+  if (!map) return null;
+  // 四段 → 三段：胆组 | 对码1+对码2（去重） | 余偶
+  const g1 = map.danzu.split('').sort().join('');
+  const g2 = [...new Set((map.duima1 + map.duima2).split(''))].sort().join('');
+  const g3 = map.yuou.split('').sort().join('');
+  return { method:'固定式断组', groups:[g1,g2,g3], desc:`对码${pair} → 胆组${map.danzu}` };
+}
+
+// 对码和九断组：对码第一段，和九第二段，余码第三段
+function duanzuHeJiu(numStr) {
+  const digits = [...new Set(numStr.split(''))];
+  // 第一段：对码（保持原始映射顺序，去重）
+  const g1Arr = [];
+  digits.forEach(d => { const dm = getDuimaDigit(d); if (!g1Arr.includes(dm)) g1Arr.push(dm); });
+  const g1 = g1Arr.join('');
+  // 第二段：和九配对（与第一段配对为9，保持顺序，去重）
+  const g2Arr = [];
+  g1Arr.forEach(d => { const hj = getHeJiu(d); if (!g2Arr.includes(hj)) g2Arr.push(hj); });
+  const g2 = g2Arr.join('');
+  // 第三段：余码
+  const all = new Set(['0','1','2','3','4','5','6','7','8','9']);
+  [...g1Arr, ...g2Arr].forEach(d => all.delete(d));
+  const g3 = [...all].sort().join('');
+  return { method:'对码和九断组', groups:[g1,g2,g3], desc:`开奖号${numStr} → 对码${g1} → 和九${g2}` };
+}
+
+// 万能四码断组：开奖号+对码=万能四码第一段，和九配对第二段，余码第三段
+function duanzuWanneng4(numStr) {
+  const digits = [...new Set(numStr.split(''))];
+  // 第一段：开奖号 + 对码 = 万能四码（保持原始顺序，去重）
+  const g1Arr = [];
+  digits.forEach(d => {
+    if (!g1Arr.includes(d)) g1Arr.push(d);
+    const dm = getDuimaDigit(d);
+    if (!g1Arr.includes(dm)) g1Arr.push(dm);
+  });
+  const g1 = g1Arr.join('');
+  // 第二段：和九配对（万能四码中各数字的补数，保持顺序，去重）
+  const g2Arr = [];
+  g1Arr.forEach(d => { const hj = getHeJiu(d); if (!g2Arr.includes(hj)) g2Arr.push(hj); });
+  const g2 = g2Arr.join('');
+  // 第三段：余码
+  const all = new Set(['0','1','2','3','4','5','6','7','8','9']);
+  [...g1Arr, ...g2Arr].forEach(d => all.delete(d));
+  const g3 = [...all].sort().join('');
+  return { method:'万能四码断组', groups:[g1,g2,g3], desc:`万能四码${g1}` };
+}
+
+// 当前断组状态（用于验证）
+let currentDuanzu = null;
+
+function calcDuanzu(method) {
+  const val = document.getElementById('duanzu-input').value.trim();
+  if (!val || val.length < 3) { alert('请输入3位开奖号码'); return; }
+  const ns = pad3(val);
+
+  let result;
+  if (method === 'fixed') result = duanzuFixed(ns);
+  else if (method === 'hejiu') result = duanzuHeJiu(ns);
+  else if (method === 'wanneng4') result = duanzuWanneng4(ns);
+
+  if (!result) { alert('无法计算断组'); return; }
+
+  currentDuanzu = result;
+  const resultDiv = document.getElementById('duanzu-result');
+  resultDiv.classList.remove('hidden');
+  document.getElementById('dz-method').textContent = result.method;
+  document.getElementById('dz-num').textContent = ns;
+  document.getElementById('dz-g1').textContent = result.groups[0];
+  document.getElementById('dz-g2').textContent = result.groups[1];
+  document.getElementById('dz-g3').textContent = result.groups[2];
+  // 清空验证区
+  document.getElementById('dz-verify-result').classList.add('hidden');
+  document.getElementById('dz-verify-input').value = '';
+}
+
+function verifyDuanzu() {
+  if (!currentDuanzu) return;
+  const val = document.getElementById('dz-verify-input').value.trim();
+  if (!val || val.length < 3) { alert('请输入3位开奖号码'); return; }
+  const ns = pad3(val);
+  const digits = ns.split('');
+  const groups = currentDuanzu.groups;
+
+  // 检查每个数字在哪一段
+  const locations = digits.map(d => {
+    for (let i = 0; i < 3; i++) {
+      if (groups[i].includes(d)) return i;
+    }
+    return -1;
+  });
+
+  const uniqueGroups = [...new Set(locations)];
+  const allInOne = uniqueGroups.length === 1;
+  const resultDiv = document.getElementById('dz-verify-result');
+  resultDiv.classList.remove('hidden');
+
+  const locStr = digits.map((d, i) => {
+    const g = locations[i];
+    const colors = ['text-blue-400', 'text-purple-400', 'text-teal-400'];
+    const labels = ['一', '二', '三'];
+    return `<span class="${colors[g]}">${d}→第${labels[g]}段</span>`;
+  }).join(' ');
+
+  if (allInOne) {
+    resultDiv.innerHTML = `<div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+      ❌ 断组错误！<span class="text-white">${ns}</span> 三个数字全部落在第${['一','二','三'][uniqueGroups[0]]}段。<br>
+      <span class="text-xs text-slate-400">${locStr}</span>
+    </div>`;
+  } else {
+    resultDiv.innerHTML = `<div class="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
+      ✅ 断组正确！<span class="text-white">${ns}</span> 分布在${uniqueGroups.length}个段中。<br>
+      <span class="text-xs text-slate-400">${locStr}</span>
+    </div>`;
+  }
 }
 
 // ==================== 模块3: 胆码预测 ====================
