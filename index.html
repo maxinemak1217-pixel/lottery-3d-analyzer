@@ -399,7 +399,7 @@
               <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
                 <div class="font-semibold text-teal-400 mb-1">万能四码断组</div>
                 <p class="text-slate-400">开奖号+对码=万能四码做第一段，和九配对做第二段，余码第三段。</p>
-                <p class="text-slate-500 mt-1">例：033 → <span class="text-blue-300">0385</span>-<span class="text-purple-300">1246</span>-<span class="text-teal-300">79</span></p>
+                <p class="text-slate-500 mt-1">例：033 → <span class="text-blue-300">0386</span>-<span class="text-purple-300">1245</span>-<span class="text-teal-300">79</span></p>
               </div>
             </div>
           </div>
@@ -963,6 +963,13 @@ const WAN_NENG = [
   { name: '组合6', pairs: ['36','38','68'] }
 ];
 
+// 30组万能四码
+const WAN_NENG_4MA = [
+  '0126','0134','0159','0178','0239','0247','0258','0357','0368','0456',
+  '0489','0679','1237','1245','1289','1358','1369','1468','1479','1567',
+  '2348','2356','2469','2579','2678','3459','3467','3789','4578','5689'
+];
+
 // 对码映射表 (05-16-27-38-49)
 const DUIMA_MAP = {
   '05': { danzu: '349', duima1: '05', duima2: '16', yuou: '278' },
@@ -1292,26 +1299,110 @@ function duanzuHeJiu(numStr) {
   return { method:'对码和九断组', groups:[g1,g2,g3], desc:`开奖号${numStr} → 对码${g1} → 和九${g2}` };
 }
 
-// 万能四码断组：开奖号+对码=万能四码第一段，和九配对第二段，余码第三段
+// 万能四码断组：第一段=包含开奖号的万能四码组，第二段=另一组万能四码，第三段=余码
 function duanzuWanneng4(numStr) {
-  const digits = [...new Set(numStr.split(''))];
-  // 第一段：开奖号 + 对码 = 万能四码（保持原始顺序，去重）
-  const g1Arr = [];
-  digits.forEach(d => {
-    if (!g1Arr.includes(d)) g1Arr.push(d);
-    const dm = getDuimaDigit(d);
-    if (!g1Arr.includes(dm)) g1Arr.push(dm);
+  const digits = [...new Set(numStr.split(''))]; // 开奖号去重数字
+  const numStrUnique = numStr.split('').filter((v,i,a) => a.indexOf(v) === i); // 保持顺序去重
+
+  // 统计每个数字的出现次数
+  const digitCounts = {};
+  numStr.split('').forEach(d => digitCounts[d] = (digitCounts[d]||0)+1);
+
+  // 辅助：计算组中包含多少开奖号数字的"对码"（按出现次数加权）
+  function countDuimaWeighted(group, targetDigits) {
+    let count = 0;
+    targetDigits.forEach(d => {
+      const dm = getDuimaDigit(d);
+      if (group.includes(dm) && !targetDigits.includes(dm)) {
+        count += digitCounts[d] || 1;
+      }
+    });
+    return count;
+  }
+
+  // 辅助：计算组中包含多少"未覆盖对码"（开奖号数字的对码，且不在第一段）
+  function countUncoveredDuima(group, targetDigits, firstGroup) {
+    let count = 0;
+    targetDigits.forEach(d => {
+      const dm = getDuimaDigit(d);
+      if (!firstGroup.includes(dm) && group.includes(dm)) count++;
+    });
+    return count;
+  }
+
+  // 辅助：按特定规则排序第一段（开奖号数字→对码→剩余）
+  function sortFirstGroup(group, targetDigitsOrdered) {
+    const result = [];
+    const groupSet = group.split('');
+    // 1. 开奖号数字（保持出现顺序）
+    targetDigitsOrdered.forEach(d => {
+      if (groupSet.includes(d) && !result.includes(d)) result.push(d);
+    });
+    // 2. 对码（按开奖号顺序）
+    targetDigitsOrdered.forEach(d => {
+      const dm = getDuimaDigit(d);
+      if (groupSet.includes(dm) && !result.includes(dm)) result.push(dm);
+    });
+    // 3. 剩余数字（按大小）
+    groupSet.forEach(d => {
+      if (!result.includes(d)) result.push(d);
+    });
+    return result.join('');
+  }
+
+  // 步骤1：找包含所有开奖号数字的万能四码组
+  const candidates1 = WAN_NENG_4MA.filter(g => digits.every(d => g.includes(d)));
+  if (candidates1.length === 0) {
+    // 退而求其次：找包含最多开奖号数字的组
+    let best = WAN_NENG_4MA[0];
+    let bestCount = 0;
+    WAN_NENG_4MA.forEach(g => {
+      const cnt = digits.filter(d => g.includes(d)).length;
+      if (cnt > bestCount) { bestCount = cnt; best = g; }
+    });
+    candidates1.push(best);
+  }
+
+  // 选对码覆盖最多的（加权）；平手选数字和最小的
+  candidates1.sort((a, b) => {
+    const dmA = countDuimaWeighted(a, digits);
+    const dmB = countDuimaWeighted(b, digits);
+    if (dmB !== dmA) return dmB - dmA;
+    const sumA = a.split('').reduce((s, d) => s + parseInt(d), 0);
+    const sumB = b.split('').reduce((s, d) => s + parseInt(d), 0);
+    return sumA - sumB;
   });
-  const g1 = g1Arr.join('');
-  // 第二段：和九配对（万能四码中各数字的补数，保持顺序，去重）
-  const g2Arr = [];
-  g1Arr.forEach(d => { const hj = getHeJiu(d); if (!g2Arr.includes(hj)) g2Arr.push(hj); });
-  const g2 = g2Arr.join('');
-  // 第三段：余码
-  const all = new Set(['0','1','2','3','4','5','6','7','8','9']);
-  [...g1Arr, ...g2Arr].forEach(d => all.delete(d));
-  const g3 = [...all].sort().join('');
-  return { method:'万能四码断组', groups:[g1,g2,g3], desc:`万能四码${g1}` };
+  const firstGroup = candidates1[0];
+
+  // 步骤2：从剩余数字中找万能四码组作为第二段
+  const remaining = [...'0123456789'].filter(d => !firstGroup.includes(d));
+  const candidates2 = WAN_NENG_4MA.filter(g => g.split('').every(d => remaining.includes(d)));
+
+  let secondGroup;
+  if (candidates2.length > 0) {
+    // 选包含最多未覆盖对码的；平手选数字和最小的
+    candidates2.sort((a, b) => {
+      const dmA = countUncoveredDuima(a, digits, firstGroup);
+      const dmB = countUncoveredDuima(b, digits, firstGroup);
+      if (dmB !== dmA) return dmB - dmA;
+      const sumA = a.split('').reduce((s, d) => s + parseInt(d), 0);
+      const sumB = b.split('').reduce((s, d) => s + parseInt(d), 0);
+      return sumA - sumB;
+    });
+    secondGroup = candidates2[0];
+  } else {
+    // 退而求其次：从剩余数字中取前4个
+    secondGroup = remaining.slice(0, 4).sort().join('');
+  }
+
+  // 步骤3：第三段是最终余码
+  const thirdGroup = [...'0123456789'].filter(d => !firstGroup.includes(d) && !secondGroup.includes(d)).sort().join('');
+
+  const g1 = sortFirstGroup(firstGroup, numStrUnique);
+  const g2 = secondGroup.split('').sort().join('');
+  const g3 = thirdGroup;
+
+  return { method:'万能四码断组', groups:[g1, g2, g3], desc:`万能四码${firstGroup}` };
 }
 
 // 当前断组状态（用于验证）
