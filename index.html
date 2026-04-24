@@ -1,180 +1,1128 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>福彩3D高级分析报告</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<style>
-body { font-family: "Microsoft YaHei", Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-.container { max-width: 1400px; margin: 0 auto; }
-h1 { text-align: center; color: #c41e3a; }
-h2 { color: #333; border-left: 4px solid #c41e3a; padding-left: 12px; margin-top: 30px; }
-h3 { color: #555; }
-.info { background: #fff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.chart-box { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.chart { width: 100%; height: 350px; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; background: #fff; }
-th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
-th { background: #c41e3a; color: white; }
-tr:nth-child(even) { background: #f9f9f9; }
-.bet-num { display: inline-block; padding: 8px 16px; background: #c41e3a; color: white; border-radius: 20px; font-weight: bold; font-size: 16px; }
-.highlight { color: #c41e3a; font-weight: bold; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>彩票预测分析平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+          },
+          colors: {
+            slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #020617; color: #e2e8f0; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
+    .nav-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; box-shadow: 0 4px 20px rgba(37,99,235,0.3); }
+    .panel { display: none; animation: fadeIn 0.35s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .num-badge { font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+    .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
+    .highlight { background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15)); border-left: 3px solid #3b82f6; }
+    input, select, textarea { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; }
+    .rule-triggered { background: rgba(34,197,94,0.12); border-left: 3px solid #22c55e; }
+    .tag { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+    .tag-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .tag-purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+    .tag-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .tag-orange { background: rgba(249,115,22,0.15); color: #fb923c; }
+    .tag-red { background: rgba(239,68,68,0.15); color: #f87171; }
+    .grid-nums { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+    .num-cell { text-align: center; padding: 6px 0; border-radius: 6px; font-weight: 600; font-size: 0.85rem; background: #1e293b; border: 1px solid #334155; cursor: pointer; transition: all 0.15s; }
+    .num-cell:hover { background: #334155; transform: scale(1.05); }
+    .num-cell.active { background: #3b82f6; border-color: #60a5fa; color: white; }
+    .num-cell.hit { background: #22c55e; border-color: #4ade80; color: white; }
+    .scroll-hide::-webkit-scrollbar { width: 6px; }
+    .scroll-hide::-webkit-scrollbar-track { background: transparent; }
+    .scroll-hide::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    .trend-arrow { display: inline-block; font-size: 0.75rem; margin-left: 4px; }
+    .trend-up { color: #f87171; }
+    .trend-down { color: #4ade80; }
+  </style>
 </head>
-<body>
-<div class="container">
-<h1>福彩3D 高级数据分析报告</h1>
-<div class="info">
-    <b>生成时间：</b>2026-04-24 10:15:53<br>
-    <b>分析期数：</b>100 期（期号 26004 ~ 26103）<br>
-    <b>最新开奖：</b>期号 <span class="highlight">26103</span>，号码 <span class="highlight">6 6 1</span>
-</div>
+<body class="min-h-screen flex overflow-hidden">
 
-<h2>一、投注号码推荐</h2>
-<div class="info">
-<h3>大遗漏号码</h3><table><tr><th>位置</th><th>数字</th><th>当前遗漏</th><th>历史最大</th><th>说明</th></tr><tr><td>百位</td><td><b>2</b></td><td>24</td><td>10</td><td>遗漏24期，超历史最大10期</td></tr><tr><td>百位</td><td><b>7</b></td><td>35</td><td>19</td><td>遗漏35期，超历史最大19期</td></tr><tr><td>十位</td><td><b>5</b></td><td>19</td><td>18</td><td>遗漏19期，超历史最大18期</td></tr><tr><td>十位</td><td><b>9</b></td><td>36</td><td>19</td><td>遗漏36期，超历史最大19期</td></tr><tr><td>个位</td><td><b>5</b></td><td>31</td><td>22</td><td>遗漏31期，超历史最大22期</td></tr></table><h3>热号号码</h3><table><tr><th>位置</th><th>数字</th><th>近10期出现</th><th>说明</th></tr><tr><td>百位</td><td><b>4</b></td><td>3</td><td>近10期出现3次，热号</td></tr><tr><td>十位</td><td><b>1</b></td><td>4</td><td>近10期出现4次，热号</td></tr></table><h3>综合推荐胆码</h3><table><tr><th>位置</th><th>数字</th><th>评分</th><th>说明</th></tr><tr><td>百位</td><td><b>2</b></td><td>5</td><td>大遗漏+24</td></tr><tr><td>百位</td><td><b>7</b></td><td>5</td><td>大遗漏+35</td></tr><tr><td>十位</td><td><b>1</b></td><td>5</td><td>热号4, 间隔4</td></tr><tr><td>十位</td><td><b>5</b></td><td>5</td><td>大遗漏+19</td></tr><tr><td>十位</td><td><b>9</b></td><td>5</td><td>大遗漏+36</td></tr><tr><td>个位</td><td><b>5</b></td><td>5</td><td>大遗漏+31</td></tr></table><h3>直选号码组合（每位候选: 百位[2, 1, 7], 十位[1, 4, 5], 个位[5, 2, 4]）</h3><div style='display:flex;flex-wrap:wrap;gap:8px;'><span class='bet-num'>215</span><span class='bet-num'>212</span><span class='bet-num'>214</span><span class='bet-num'>245</span><span class='bet-num'>242</span><span class='bet-num'>244</span><span class='bet-num'>255</span><span class='bet-num'>252</span><span class='bet-num'>254</span><span class='bet-num'>115</span><span class='bet-num'>112</span><span class='bet-num'>114</span><span class='bet-num'>145</span><span class='bet-num'>142</span><span class='bet-num'>144</span><span class='bet-num'>155</span><span class='bet-num'>152</span><span class='bet-num'>154</span><span class='bet-num'>715</span><span class='bet-num'>712</span><span class='bet-num'>714</span><span class='bet-num'>745</span><span class='bet-num'>742</span><span class='bet-num'>744</span><span class='bet-num'>755</span><span class='bet-num'>752</span><span class='bet-num'>754</span></div>
-</div>
+  <!-- 左侧导航 -->
+  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+    <div class="p-6 border-b border-slate-800">
+      <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">🔮 预测分析平台</h1>
+      <p class="text-xs text-slate-500 mt-1">智能号码走势分析系统</p>
+    </div>
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto scroll-hide">
+      <button onclick="switchPanel('generator')" id="nav-generator" class="nav-btn active w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🎰</span> 号码生成器
+      </button>
+      <button onclick="switchPanel('trend')" id="nav-trend" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📈</span> 走势分析
+      </button>
+      <button onclick="switchPanel('dancodes')" id="nav-dancodes" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🎯</span> 胆码预测
+      </button>
+      <button onclick="switchPanel('seven')" id="nav-seven" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🔢</span> 万能七码
+      </button>
+      <button onclick="switchPanel('rules')" id="nav-rules" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">⚡</span> 规则引擎
+      </button>
+      <button onclick="switchPanel('span')" id="nav-span" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📐</span> 跨度分析
+      </button>
+      <button onclick="switchPanel('filter')" id="nav-filter" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">🔍</span> 万能组合
+      </button>
+      <button onclick="switchPanel('3ddata')" id="nav-3ddata" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📊</span> 3D数据
+      </button>
+    </nav>
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-600 text-center">
+      基于Excel预测模型构建<br>仅供学习研究使用
+    </div>
+  </aside>
 
-<h2>二、遗漏期数可视化</h2>
-<div class="grid">
-    <div class="chart-box"><div id="missBai" class="chart"></div></div>
-    <div class="chart-box"><div id="missShi" class="chart"></div></div>
-    <div class="chart-box"><div id="missGe" class="chart"></div></div>
-</div>
+  <!-- 主内容区 -->
+  <main class="flex-1 overflow-y-auto scroll-hide p-8">
 
-<h2>三、走势图表</h2>
-<div class="chart-box"><div id="sumTrend" class="chart"></div></div>
-<div class="chart-box"><div id="spanTrend" class="chart"></div></div>
+    <!-- 模块1: 号码生成器 -->
+    <div id="panel-generator" class="panel active">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">号码生成器</h2>
+        <p class="text-slate-400 mt-1">生成全部1000注直选号码，自动分类组六、组三、豹子</p>
+      </div>
 
-<h2>四、分布统计</h2>
-<div class="grid">
-    <div class="chart-box"><div id="sumDist" class="chart"></div></div>
-    <div class="chart-box"><div id="spanDist" class="chart"></div></div>
-    <div class="chart-box"><div id="tailDist" class="chart"></div></div>
-    <div class="chart-box"><div id="oeDist" class="chart"></div></div>
-    <div class="chart-box"><div id="bsDist" class="chart"></div></div>
-    <div class="chart-box"><div id="r012Dist" class="chart"></div></div>
-</div>
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">总注数</div>
+          <div class="text-2xl font-bold text-white num-badge">1000</div>
+          <div class="tag tag-blue mt-2">000-999</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">组六直选</div>
+          <div class="text-2xl font-bold text-blue-400 num-badge" id="count-z6">720</div>
+          <div class="tag tag-blue mt-2">三码不同</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">组三直选</div>
+          <div class="text-2xl font-bold text-purple-400 num-badge" id="count-z3">270</div>
+          <div class="tag tag-purple mt-2">含对子</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">豹子</div>
+          <div class="text-2xl font-bold text-orange-400 num-badge" id="count-bz">10</div>
+          <div class="tag tag-orange mt-2">三码相同</div>
+        </div>
+      </div>
 
-<h2>五、近20期详细数据</h2>
-<table>
-<tr><th>期号</th><th>开奖号</th><th>和值</th><th>跨度</th><th>奇偶比</th><th>大小比</th><th>012路</th><th>和尾</th><th>质合比</th></tr>
-<tr><td>26084</td><td><b>4 5 6</b></td><td>15</td><td>2</td><td>1奇2偶</td><td>2大1小</td><td>1路1路1路</td><td>5</td><td>1质2合</td></tr><tr><td>26085</td><td><b>1 1 8</b></td><td>10</td><td>7</td><td>2奇1偶</td><td>1大2小</td><td>0路2路1路</td><td>0</td><td>0质1合</td></tr><tr><td>26086</td><td><b>3 8 2</b></td><td>13</td><td>6</td><td>1奇2偶</td><td>1大2小</td><td>1路0路2路</td><td>3</td><td>2质1合</td></tr><tr><td>26087</td><td><b>9 1 1</b></td><td>11</td><td>8</td><td>3奇0偶</td><td>1大2小</td><td>1路2路0路</td><td>1</td><td>0质1合</td></tr><tr><td>26088</td><td><b>6 0 8</b></td><td>14</td><td>8</td><td>0奇3偶</td><td>2大1小</td><td>2路0路1路</td><td>4</td><td>0质2合</td></tr><tr><td>26089</td><td><b>9 2 2</b></td><td>13</td><td>7</td><td>1奇2偶</td><td>1大2小</td><td>1路0路2路</td><td>3</td><td>2质1合</td></tr><tr><td>26090</td><td><b>8 1 6</b></td><td>15</td><td>7</td><td>1奇2偶</td><td>2大1小</td><td>1路1路1路</td><td>5</td><td>0质2合</td></tr><tr><td>26091</td><td><b>5 3 7</b></td><td>15</td><td>4</td><td>3奇0偶</td><td>2大1小</td><td>1路1路1路</td><td>5</td><td>3质0合</td></tr><tr><td>26092</td><td><b>8 7 0</b></td><td>15</td><td>8</td><td>1奇2偶</td><td>2大1小</td><td>1路1路1路</td><td>5</td><td>1质1合</td></tr><tr><td>26093</td><td><b>5 1 8</b></td><td>14</td><td>7</td><td>2奇1偶</td><td>2大1小</td><td>0路1路2路</td><td>4</td><td>1质1合</td></tr><tr><td>26094</td><td><b>4 1 8</b></td><td>13</td><td>7</td><td>1奇2偶</td><td>1大2小</td><td>0路2路1路</td><td>3</td><td>0质2合</td></tr><tr><td>26095</td><td><b>0 2 2</b></td><td>4</td><td>2</td><td>0奇3偶</td><td>0大3小</td><td>1路0路2路</td><td>4</td><td>2质0合</td></tr><tr><td>26096</td><td><b>6 8 9</b></td><td>23</td><td>3</td><td>1奇2偶</td><td>3大0小</td><td>2路0路1路</td><td>3</td><td>0质3合</td></tr><tr><td>26097</td><td><b>8 1 8</b></td><td>17</td><td>7</td><td>1奇2偶</td><td>2大1小</td><td>0路1路2路</td><td>7</td><td>0质2合</td></tr><tr><td>26098</td><td><b>5 1 3</b></td><td>9</td><td>4</td><td>3奇0偶</td><td>1大2小</td><td>1路1路1路</td><td>9</td><td>2质0合</td></tr><tr><td>26099</td><td><b>8 7 7</b></td><td>22</td><td>1</td><td>2奇1偶</td><td>3大0小</td><td>0路2路1路</td><td>2</td><td>2质1合</td></tr><tr><td>26100</td><td><b>4 1 4</b></td><td>9</td><td>3</td><td>1奇2偶</td><td>0大3小</td><td>0路3路0路</td><td>9</td><td>0质2合</td></tr><tr><td>26101</td><td><b>5 8 4</b></td><td>17</td><td>4</td><td>1奇2偶</td><td>2大1小</td><td>0路1路2路</td><td>7</td><td>1质2合</td></tr><tr><td>26102</td><td><b>4 2 0</b></td><td>6</td><td>4</td><td>0奇3偶</td><td>0大3小</td><td>1路1路1路</td><td>6</td><td>1质1合</td></tr><tr><td>26103</td><td><b>6 6 1</b></td><td>13</td><td>5</td><td>1奇2偶</td><td>2大1小</td><td>2路1路0路</td><td>3</td><td>0质2合</td></tr>
-</table>
-</div>
+      <!-- 过滤条件 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">🔍 过滤条件</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">跨度范围</label>
+            <div class="flex gap-2">
+              <input type="number" id="f-span-min" min="0" max="9" value="0" class="w-full px-3 py-2 rounded-lg text-sm">
+              <input type="number" id="f-span-max" min="0" max="9" value="9" class="w-full px-3 py-2 rounded-lg text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">和值范围</label>
+            <div class="flex gap-2">
+              <input type="number" id="f-sum-min" min="0" max="27" value="0" class="w-full px-3 py-2 rounded-lg text-sm">
+              <input type="number" id="f-sum-max" min="0" max="27" value="27" class="w-full px-3 py-2 rounded-lg text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">类型筛选</label>
+            <select id="f-type" class="w-full px-3 py-2 rounded-lg text-sm">
+              <option value="all">全部</option>
+              <option value="z6">组六</option>
+              <option value="z3">组三</option>
+              <option value="bz">豹子</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="generateNumbers()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">生成号码</button>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2 items-center">
+          <span class="text-xs text-slate-500">包含数字:</span>
+          <div class="flex gap-1" id="include-digits">
+            ${[0,1,2,3,4,5,6,7,8,9].map(d => `<button class="num-cell w-8" data-d="${d}" onclick="toggleDigit(this)">${d}</button>`).join('')}
+          </div>
+          <span class="text-xs text-slate-500 ml-4">排除数字:</span>
+          <div class="flex gap-1" id="exclude-digits">
+            ${[0,1,2,3,4,5,6,7,8,9].map(d => `<button class="num-cell w-8" data-d="${d}" onclick="toggleExclude(this)">${d}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- 结果展示 -->
+      <div class="glass rounded-xl p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-semibold text-slate-200">生成结果 <span id="result-count" class="text-slate-500 font-normal">(共 1000 注)</span></h3>
+          <div class="flex gap-2">
+            <button onclick="copyResults()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">复制全部</button>
+            <button onclick="exportCSV()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">导出CSV</button>
+          </div>
+        </div>
+        <div id="number-grid" class="grid grid-cols-10 sm:grid-cols-15 md:grid-cols-20 gap-1.5 max-h-96 overflow-y-auto scroll-hide p-1">
+          <!-- JS填充 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块2: 走势分析 -->
+    <div id="panel-trend" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">走势分析</h2>
+        <p class="text-slate-400 mt-1">输入历史开奖号码，计算任两码和差、跨度走势与预测</p>
+      </div>
+
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">输入最近三期号码（从远到近）</h3>
+        <div class="flex flex-wrap gap-3">
+          <input type="text" id="trend-h1" placeholder="第一期 如: 123" maxlength="3" class="w-28 px-3 py-2 rounded-lg text-sm text-center tracking-widest">
+          <input type="text" id="trend-h2" placeholder="第二期 如: 456" maxlength="3" class="w-28 px-3 py-2 rounded-lg text-sm text-center tracking-widest">
+          <input type="text" id="trend-h3" placeholder="第三期 如: 789" maxlength="3" class="w-28 px-3 py-2 rounded-lg text-sm text-center tracking-widest">
+          <button onclick="analyzeTrend()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">分析走势</button>
+        </div>
+      </div>
+
+      <div id="trend-results" class="space-y-4">
+        <!-- 动态生成 -->
+        <div class="text-slate-500 text-center py-12">输入号码后点击分析，查看走势预测</div>
+      </div>
+    </div>
+
+    <!-- 模块3: 胆码预测 -->
+    <div id="panel-dancodes" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">胆码预测</h2>
+        <p class="text-slate-400 mt-1">基于上期组三对子预测下期胆码，查看胆码映射关系</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-xl p-5">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4">输入上期开奖号码</h3>
+          <input type="text" id="dan-input" placeholder="如: 112 或 223" maxlength="3" class="w-full px-4 py-3 rounded-lg text-lg text-center tracking-[0.5em] font-bold mb-4">
+          <button onclick="predictDan()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">预测胆码</button>
+          <div id="dan-result" class="mt-4 hidden">
+            <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+              <div class="text-xs text-slate-500 mb-2">号码类型</div>
+              <div id="dan-type" class="text-sm font-medium text-white mb-3"></div>
+              <div class="text-xs text-slate-500 mb-2">推荐胆码（未来1-3期重点关注）</div>
+              <div id="dan-codes" class="flex gap-2 flex-wrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4">组三对子 → 胆码映射表</h3>
+          <div class="grid grid-cols-2 gap-2" id="dan-map">
+            <!-- JS填充 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块4: 万能七码 -->
+    <div id="panel-seven" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">万能七码</h2>
+        <p class="text-slate-400 mt-1">六组万能七码覆盖，输入号码自动匹配所属分组</p>
+      </div>
+
+      <div class="glass rounded-xl p-5 mb-6">
+        <div class="flex gap-3">
+          <input type="text" id="seven-input" placeholder="输入号码 如: 123" maxlength="3" class="w-48 px-4 py-2.5 rounded-lg text-center tracking-[0.5em] font-bold">
+          <button onclick="matchSeven()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">匹配分组</button>
+        </div>
+        <div id="seven-result" class="mt-4 hidden">
+          <div class="text-sm text-slate-300">号码 <span id="seven-num" class="font-bold text-white"></span> 命中以下分组：</div>
+          <div id="seven-matches" class="flex gap-2 mt-2 flex-wrap"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="seven-groups">
+        <!-- JS填充 -->
+      </div>
+    </div>
+
+    <!-- 模块5: 规则引擎 -->
+    <div id="panel-rules" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">规则引擎</h2>
+        <p class="text-slate-400 mt-1">输入当前百位/十位/个位，自动触发9大预测规则</p>
+      </div>
+
+      <div class="glass rounded-xl p-5 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">百位</label>
+            <input type="number" id="r-bai" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">十位</label>
+            <input type="number" id="r-shi" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">个位</label>
+            <input type="number" id="r-ge" min="0" max="9" class="w-16 px-3 py-2 rounded-lg text-center text-lg font-bold">
+          </div>
+          <button onclick="runRules()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">执行规则</button>
+        </div>
+      </div>
+
+      <div id="rules-results" class="space-y-3">
+        <!-- JS填充 -->
+      </div>
+    </div>
+
+    <!-- 模块6: 跨度分析 -->
+    <div id="panel-span" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">跨度分析</h2>
+        <p class="text-slate-400 mt-1">输入历史跨度序列，分析分布、走势与回调预测</p>
+      </div>
+
+      <div class="glass rounded-xl p-5 mb-6">
+        <div class="flex gap-3 flex-wrap">
+          <input type="text" id="span-input" placeholder="输入跨度序列，用逗号分隔 如: 6,4,7,5,8,6" class="flex-1 min-w-[200px] px-4 py-2.5 rounded-lg text-sm">
+          <button onclick="analyzeSpan()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">分析</button>
+        </div>
+      </div>
+
+      <div id="span-results" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="text-slate-500 text-center py-12 col-span-full">输入跨度序列后查看分析结果</div>
+      </div>
+    </div>
+
+    <!-- 模块7: 万能组合 -->
+    <div id="panel-filter" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">万能组合</h2>
+        <p class="text-slate-400 mt-1">6组万能两码组合，用于号码过滤与匹配</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6" id="wanneng-groups">
+        <!-- JS填充 -->
+      </div>
+
+      <div class="glass rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">号码匹配检测</h3>
+        <div class="flex gap-3 mb-4">
+          <input type="text" id="wn-input" placeholder="输入号码 如: 123" maxlength="3" class="w-48 px-4 py-2.5 rounded-lg text-center tracking-[0.5em] font-bold">
+          <button onclick="matchWanneng()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">检测</button>
+        </div>
+        <div id="wn-result" class="hidden">
+          <div class="text-sm text-slate-300 mb-2">分解两码：</div>
+          <div id="wn-pairs" class="flex gap-2 mb-3"></div>
+          <div class="text-sm text-slate-300 mb-2">命中组合：</div>
+          <div id="wn-matches" class="flex gap-2 flex-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 模块8: 3D数据看板 -->
+    <div id="panel-3ddata" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">福彩3D 数据看板</h2>
+        <p class="text-slate-400 mt-1">基于中彩网最近100期开奖数据的实时分析</p>
+      </div>
+
+      <!-- 最新开奖 -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">最新期号</div>
+          <div class="text-2xl font-bold text-white num-badge" id="latest-issue">--</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">最新开奖号</div>
+          <div class="text-2xl font-bold text-blue-400 num-badge" id="latest-num">--</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">分析期数</div>
+          <div class="text-2xl font-bold text-green-400 num-badge" id="total-count">--</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">数据范围</div>
+          <div class="text-sm font-bold text-purple-400 mt-1" id="data-range">--</div>
+        </div>
+      </div>
+
+      <!-- 投注推荐 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">🎯 智能投注推荐</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="bet-recommendations">
+          <!-- JS填充 -->
+        </div>
+      </div>
+
+      <!-- 遗漏期数 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📊 遗漏期数分析（数字越大越值得关注）</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div>
+            <div class="text-xs text-slate-500 mb-2 text-center">百位遗漏</div>
+            <div class="grid grid-cols-5 gap-1" id="miss-bai"></div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 mb-2 text-center">十位遗漏</div>
+            <div class="grid grid-cols-5 gap-1" id="miss-shi"></div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 mb-2 text-center">个位遗漏</div>
+            <div class="grid grid-cols-5 gap-1" id="miss-ge"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 高级统计表格 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📋 近20期详细数据</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-slate-500 text-xs">
+              <tr><th class="text-left py-2">期号</th><th class="text-center">开奖号</th><th class="text-center">和值</th><th class="text-center">跨度</th><th class="text-center">奇偶比</th><th class="text-center">大小比</th><th class="text-center">012路</th><th class="text-center">和尾</th><th class="text-center">质合比</th></tr>
+            </thead>
+            <tbody class="text-slate-300" id="stats-table">
+              <!-- JS填充 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 全部历史数据 -->
+      <div class="glass rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📈 全部开奖历史</h3>
+        <div class="grid grid-cols-10 sm:grid-cols-15 md:grid-cols-20 gap-1.5 max-h-80 overflow-y-auto scroll-hide p-1" id="history-grid">
+          <!-- JS填充 -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
 <script>
-// 遗漏期数 - 百位
-var missBai = echarts.init(document.getElementById('missBai'));
-missBai.setOption({
-    title: { text: '百位遗漏期数', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] },
-    yAxis: { type: 'value', name: '遗漏期数' },
-    series: [{ data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100], type: 'bar', itemStyle: { color: function(p) { return p.value > 20 ? '#c41e3a' : '#5470c6'; } } }]
+
+const LOTTERY_DATA = [{'issue': '26004', 'num': '019', 'bai': 0, 'shi': 1, 'ge': 9}, {'issue': '26005', 'num': '476', 'bai': 4, 'shi': 7, 'ge': 6}, {'issue': '26006', 'num': '244', 'bai': 2, 'shi': 4, 'ge': 4}, {'issue': '26007', 'num': '353', 'bai': 3, 'shi': 5, 'ge': 3}, {'issue': '26008', 'num': '252', 'bai': 2, 'shi': 5, 'ge': 2}, {'issue': '26009', 'num': '265', 'bai': 2, 'shi': 6, 'ge': 5}, {'issue': '26010', 'num': '667', 'bai': 6, 'shi': 6, 'ge': 7}, {'issue': '26011', 'num': '647', 'bai': 6, 'shi': 4, 'ge': 7}, {'issue': '26012', 'num': '241', 'bai': 2, 'shi': 4, 'ge': 1}, {'issue': '26013', 'num': '513', 'bai': 5, 'shi': 1, 'ge': 3}, {'issue': '26014', 'num': '050', 'bai': 0, 'shi': 5, 'ge': 0}, {'issue': '26015', 'num': '532', 'bai': 5, 'shi': 3, 'ge': 2}, {'issue': '26016', 'num': '582', 'bai': 5, 'shi': 8, 'ge': 2}, {'issue': '26017', 'num': '945', 'bai': 9, 'shi': 4, 'ge': 5}, {'issue': '26018', 'num': '494', 'bai': 4, 'shi': 9, 'ge': 4}, {'issue': '26019', 'num': '223', 'bai': 2, 'shi': 2, 'ge': 3}, {'issue': '26020', 'num': '676', 'bai': 6, 'shi': 7, 'ge': 6}, {'issue': '26021', 'num': '559', 'bai': 5, 'shi': 5, 'ge': 9}, {'issue': '26022', 'num': '678', 'bai': 6, 'shi': 7, 'ge': 8}, {'issue': '26023', 'num': '784', 'bai': 7, 'shi': 8, 'ge': 4}, {'issue': '26024', 'num': '911', 'bai': 9, 'shi': 1, 'ge': 1}, {'issue': '26025', 'num': '029', 'bai': 0, 'shi': 2, 'ge': 9}, {'issue': '26026', 'num': '099', 'bai': 0, 'shi': 9, 'ge': 9}, {'issue': '26027', 'num': '126', 'bai': 1, 'shi': 2, 'ge': 6}, {'issue': '26028', 'num': '270', 'bai': 2, 'shi': 7, 'ge': 0}, {'issue': '26029', 'num': '003', 'bai': 0, 'shi': 0, 'ge': 3}, {'issue': '26030', 'num': '134', 'bai': 1, 'shi': 3, 'ge': 4}, {'issue': '26031', 'num': '142', 'bai': 1, 'shi': 4, 'ge': 2}, {'issue': '26032', 'num': '452', 'bai': 4, 'shi': 5, 'ge': 2}, {'issue': '26033', 'num': '119', 'bai': 1, 'shi': 1, 'ge': 9}, {'issue': '26034', 'num': '052', 'bai': 0, 'shi': 5, 'ge': 2}, {'issue': '26035', 'num': '213', 'bai': 2, 'shi': 1, 'ge': 3}, {'issue': '26036', 'num': '762', 'bai': 7, 'shi': 6, 'ge': 2}, {'issue': '26037', 'num': '420', 'bai': 4, 'shi': 2, 'ge': 0}, {'issue': '26038', 'num': '467', 'bai': 4, 'shi': 6, 'ge': 7}, {'issue': '26039', 'num': '450', 'bai': 4, 'shi': 5, 'ge': 0}, {'issue': '26040', 'num': '425', 'bai': 4, 'shi': 2, 'ge': 5}, {'issue': '26041', 'num': '901', 'bai': 9, 'shi': 0, 'ge': 1}, {'issue': '26042', 'num': '854', 'bai': 8, 'shi': 5, 'ge': 4}, {'issue': '26043', 'num': '765', 'bai': 7, 'shi': 6, 'ge': 5}, {'issue': '26044', 'num': '589', 'bai': 5, 'shi': 8, 'ge': 9}, {'issue': '26045', 'num': '181', 'bai': 1, 'shi': 8, 'ge': 1}, {'issue': '26046', 'num': '291', 'bai': 2, 'shi': 9, 'ge': 1}, {'issue': '26047', 'num': '936', 'bai': 9, 'shi': 3, 'ge': 6}, {'issue': '26048', 'num': '612', 'bai': 6, 'shi': 1, 'ge': 2}, {'issue': '26049', 'num': '110', 'bai': 1, 'shi': 1, 'ge': 0}, {'issue': '26050', 'num': '689', 'bai': 6, 'shi': 8, 'ge': 9}, {'issue': '26051', 'num': '302', 'bai': 3, 'shi': 0, 'ge': 2}, {'issue': '26052', 'num': '277', 'bai': 2, 'shi': 7, 'ge': 7}, {'issue': '26053', 'num': '755', 'bai': 7, 'shi': 5, 'ge': 5}, {'issue': '26054', 'num': '217', 'bai': 2, 'shi': 1, 'ge': 7}, {'issue': '26055', 'num': '107', 'bai': 1, 'shi': 0, 'ge': 7}, {'issue': '26056', 'num': '477', 'bai': 4, 'shi': 7, 'ge': 7}, {'issue': '26057', 'num': '264', 'bai': 2, 'shi': 6, 'ge': 4}, {'issue': '26058', 'num': '543', 'bai': 5, 'shi': 4, 'ge': 3}, {'issue': '26059', 'num': '794', 'bai': 7, 'shi': 9, 'ge': 4}, {'issue': '26060', 'num': '943', 'bai': 9, 'shi': 4, 'ge': 3}, {'issue': '26061', 'num': '429', 'bai': 4, 'shi': 2, 'ge': 9}, {'issue': '26062', 'num': '294', 'bai': 2, 'shi': 9, 'ge': 4}, {'issue': '26063', 'num': '517', 'bai': 5, 'shi': 1, 'ge': 7}, {'issue': '26064', 'num': '604', 'bai': 6, 'shi': 0, 'ge': 4}, {'issue': '26065', 'num': '057', 'bai': 0, 'shi': 5, 'ge': 7}, {'issue': '26066', 'num': '934', 'bai': 9, 'shi': 3, 'ge': 4}, {'issue': '26067', 'num': '695', 'bai': 6, 'shi': 9, 'ge': 5}, {'issue': '26068', 'num': '706', 'bai': 7, 'shi': 0, 'ge': 6}, {'issue': '26069', 'num': '908', 'bai': 9, 'shi': 0, 'ge': 8}, {'issue': '26070', 'num': '484', 'bai': 4, 'shi': 8, 'ge': 4}, {'issue': '26071', 'num': '261', 'bai': 2, 'shi': 6, 'ge': 1}, {'issue': '26072', 'num': '245', 'bai': 2, 'shi': 4, 'ge': 5}, {'issue': '26073', 'num': '504', 'bai': 5, 'shi': 0, 'ge': 4}, {'issue': '26074', 'num': '487', 'bai': 4, 'shi': 8, 'ge': 7}, {'issue': '26075', 'num': '816', 'bai': 8, 'shi': 1, 'ge': 6}, {'issue': '26076', 'num': '863', 'bai': 8, 'shi': 6, 'ge': 3}, {'issue': '26077', 'num': '112', 'bai': 1, 'shi': 1, 'ge': 2}, {'issue': '26078', 'num': '049', 'bai': 0, 'shi': 4, 'ge': 9}, {'issue': '26079', 'num': '233', 'bai': 2, 'shi': 3, 'ge': 3}, {'issue': '26080', 'num': '802', 'bai': 8, 'shi': 0, 'ge': 2}, {'issue': '26081', 'num': '827', 'bai': 8, 'shi': 2, 'ge': 7}, {'issue': '26082', 'num': '942', 'bai': 9, 'shi': 4, 'ge': 2}, {'issue': '26083', 'num': '506', 'bai': 5, 'shi': 0, 'ge': 6}, {'issue': '26084', 'num': '456', 'bai': 4, 'shi': 5, 'ge': 6}, {'issue': '26085', 'num': '118', 'bai': 1, 'shi': 1, 'ge': 8}, {'issue': '26086', 'num': '382', 'bai': 3, 'shi': 8, 'ge': 2}, {'issue': '26087', 'num': '911', 'bai': 9, 'shi': 1, 'ge': 1}, {'issue': '26088', 'num': '608', 'bai': 6, 'shi': 0, 'ge': 8}, {'issue': '26089', 'num': '922', 'bai': 9, 'shi': 2, 'ge': 2}, {'issue': '26090', 'num': '816', 'bai': 8, 'shi': 1, 'ge': 6}, {'issue': '26091', 'num': '537', 'bai': 5, 'shi': 3, 'ge': 7}, {'issue': '26092', 'num': '870', 'bai': 8, 'shi': 7, 'ge': 0}, {'issue': '26093', 'num': '518', 'bai': 5, 'shi': 1, 'ge': 8}, {'issue': '26094', 'num': '418', 'bai': 4, 'shi': 1, 'ge': 8}, {'issue': '26095', 'num': '022', 'bai': 0, 'shi': 2, 'ge': 2}, {'issue': '26096', 'num': '689', 'bai': 6, 'shi': 8, 'ge': 9}, {'issue': '26097', 'num': '818', 'bai': 8, 'shi': 1, 'ge': 8}, {'issue': '26098', 'num': '513', 'bai': 5, 'shi': 1, 'ge': 3}, {'issue': '26099', 'num': '877', 'bai': 8, 'shi': 7, 'ge': 7}, {'issue': '26100', 'num': '414', 'bai': 4, 'shi': 1, 'ge': 4}, {'issue': '26101', 'num': '584', 'bai': 5, 'shi': 8, 'ge': 4}, {'issue': '26102', 'num': '420', 'bai': 4, 'shi': 2, 'ge': 0}, {'issue': '26103', 'num': '661', 'bai': 6, 'shi': 6, 'ge': 1}];
+const MISSING_DATA = {'bai': {0: {'current': 8, 'max': 30, 'appearances': 9, 'freq': 9.0}, 1: {'current': 18, 'max': 23, 'appearances': 9, 'freq': 9.0}, 2: {'current': 24, 'max': 10, 'appearances': 15, 'freq': 15.0}, 3: {'current': 17, 'max': 43, 'appearances': 3, 'freq': 3.0}, 4: {'current': 1, 'max': 15, 'appearances': 15, 'freq': 15.0}, 5: {'current': 2, 'max': 22, 'appearances': 13, 'freq': 13.0}, 6: {'current': 0, 'max': 25, 'appearances': 11, 'freq': 11.0}, 7: {'current': 35, 'max': 19, 'appearances': 6, 'freq': 6.0}, 8: {'current': 4, 'max': 38, 'appearances': 9, 'freq': 9.0}, 9: {'current': 14, 'max': 16, 'appearances': 10, 'freq': 10.0}}, 'shi': {0: {'current': 15, 'max': 25, 'appearances': 11, 'freq': 11.0}, 1: {'current': 3, 'max': 12, 'appearances': 19, 'freq': 19.0}, 2: {'current': 1, 'max': 20, 'appearances': 10, 'freq': 10.0}, 3: {'current': 12, 'max': 18, 'appearances': 6, 'freq': 6.0}, 4: {'current': 21, 'max': 26, 'appearances': 10, 'freq': 10.0}, 5: {'current': 19, 'max': 18, 'appearances': 11, 'freq': 11.0}, 6: {'current': 0, 'max': 26, 'appearances': 9, 'freq': 9.0}, 7: {'current': 4, 'max': 35, 'appearances': 8, 'freq': 8.0}, 8: {'current': 2, 'max': 20, 'appearances': 10, 'freq': 10.0}, 9: {'current': 36, 'max': 19, 'appearances': 6, 'freq': 6.0}}, 'ge': {0: {'current': 1, 'max': 42, 'appearances': 7, 'freq': 7.0}, 1: {'current': 0, 'max': 24, 'appearances': 8, 'freq': 8.0}, 2: {'current': 8, 'max': 25, 'appearances': 15, 'freq': 15.0}, 3: {'current': 5, 'max': 22, 'appearances': 10, 'freq': 10.0}, 4: {'current': 2, 'max': 26, 'appearances': 14, 'freq': 14.0}, 5: {'current': 31, 'max': 22, 'appearances': 7, 'freq': 7.0}, 6: {'current': 13, 'max': 20, 'appearances': 9, 'freq': 9.0}, 7: {'current': 4, 'max': 26, 'appearances': 13, 'freq': 13.0}, 8: {'current': 6, 'max': 46, 'appearances': 7, 'freq': 7.0}, 9: {'current': 7, 'max': 17, 'appearances': 10, 'freq': 10.0}}};
+const HOT_DATA = {'bai': {'hot': [4], 'cold': [0, 1, 2, 3, 7, 9], 'gap': [{'num': 2, 'count': 2}, {'num': 5, 'count': 2}, {'num': 6, 'count': 2}, {'num': 8, 'count': 2}]}, 'shi': {'hot': [1], 'cold': [0, 3, 4, 5, 6, 7, 9], 'gap': [{'num': 1, 'count': 4}]}, 'ge': {'hot': [], 'cold': [0, 1, 3, 4, 5, 6, 7, 9], 'gap': [{'num': 2, 'count': 3}, {'num': 4, 'count': 3}, {'num': 7, 'count': 2}]}};
+const STATS_DATA = [{'issue': '26004', 'num': '019', 'sum': 10, 'span': 9, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 0, 'pc': '0质1合'}, {'issue': '26005', 'num': '476', 'sum': 17, 'span': 3, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:2:0', 'tail': 7, 'pc': '1质2合'}, {'issue': '26006', 'num': '244', 'sum': 10, 'span': 2, 'oe': '0奇3偶', 'bs': '0大3小', 'r012': '0:2:1', 'tail': 0, 'pc': '1质2合'}, {'issue': '26007', 'num': '353', 'sum': 11, 'span': 2, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '2:0:1', 'tail': 1, 'pc': '3质0合'}, {'issue': '26008', 'num': '252', 'sum': 9, 'span': 3, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '0:0:3', 'tail': 9, 'pc': '3质0合'}, {'issue': '26009', 'num': '265', 'sum': 13, 'span': 4, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:0:2', 'tail': 3, 'pc': '2质1合'}, {'issue': '26010', 'num': '667', 'sum': 19, 'span': 1, 'oe': '1奇2偶', 'bs': '3大0小', 'r012': '2:1:0', 'tail': 9, 'pc': '1质2合'}, {'issue': '26011', 'num': '647', 'sum': 17, 'span': 3, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:2:0', 'tail': 7, 'pc': '1质2合'}, {'issue': '26012', 'num': '241', 'sum': 7, 'span': 3, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '0:2:1', 'tail': 7, 'pc': '1质1合'}, {'issue': '26013', 'num': '513', 'sum': 9, 'span': 4, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '2质0合'}, {'issue': '26014', 'num': '050', 'sum': 5, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '2:0:1', 'tail': 5, 'pc': '1质0合'}, {'issue': '26015', 'num': '532', 'sum': 10, 'span': 3, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '1:0:2', 'tail': 0, 'pc': '3质0合'}, {'issue': '26016', 'num': '582', 'sum': 15, 'span': 6, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:0:3', 'tail': 5, 'pc': '2质1合'}, {'issue': '26017', 'num': '945', 'sum': 18, 'span': 5, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 8, 'pc': '1质2合'}, {'issue': '26018', 'num': '494', 'sum': 17, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:2:0', 'tail': 7, 'pc': '0质3合'}, {'issue': '26019', 'num': '223', 'sum': 7, 'span': 1, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '1:0:2', 'tail': 7, 'pc': '3质0合'}, {'issue': '26020', 'num': '676', 'sum': 19, 'span': 1, 'oe': '1奇2偶', 'bs': '3大0小', 'r012': '2:1:0', 'tail': 9, 'pc': '1质2合'}, {'issue': '26021', 'num': '559', 'sum': 19, 'span': 4, 'oe': '3奇0偶', 'bs': '3大0小', 'r012': '1:0:2', 'tail': 9, 'pc': '2质1合'}, {'issue': '26022', 'num': '678', 'sum': 21, 'span': 2, 'oe': '1奇2偶', 'bs': '3大0小', 'r012': '1:1:1', 'tail': 1, 'pc': '1质2合'}, {'issue': '26023', 'num': '784', 'sum': 19, 'span': 4, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:2:1', 'tail': 9, 'pc': '1质2合'}, {'issue': '26024', 'num': '911', 'sum': 11, 'span': 8, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '1:2:0', 'tail': 1, 'pc': '0质1合'}, {'issue': '26025', 'num': '029', 'sum': 11, 'span': 9, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '2:0:1', 'tail': 1, 'pc': '1质1合'}, {'issue': '26026', 'num': '099', 'sum': 18, 'span': 9, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '3:0:0', 'tail': 8, 'pc': '0质2合'}, {'issue': '26027', 'num': '126', 'sum': 9, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '1质1合'}, {'issue': '26028', 'num': '270', 'sum': 9, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '2质0合'}, {'issue': '26029', 'num': '003', 'sum': 3, 'span': 3, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '3:0:0', 'tail': 3, 'pc': '1质0合'}, {'issue': '26030', 'num': '134', 'sum': 8, 'span': 3, 'oe': '2奇1偶', 'bs': '0大3小', 'r012': '1:2:0', 'tail': 8, 'pc': '1质1合'}, {'issue': '26031', 'num': '142', 'sum': 7, 'span': 3, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '0:2:1', 'tail': 7, 'pc': '1质1合'}, {'issue': '26032', 'num': '452', 'sum': 11, 'span': 3, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '0:1:2', 'tail': 1, 'pc': '2质1合'}, {'issue': '26033', 'num': '119', 'sum': 11, 'span': 8, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '1:2:0', 'tail': 1, 'pc': '0质1合'}, {'issue': '26034', 'num': '052', 'sum': 7, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:0:2', 'tail': 7, 'pc': '2质0合'}, {'issue': '26035', 'num': '213', 'sum': 6, 'span': 2, 'oe': '2奇1偶', 'bs': '0大3小', 'r012': '1:1:1', 'tail': 6, 'pc': '2质0合'}, {'issue': '26036', 'num': '762', 'sum': 15, 'span': 5, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '2质1合'}, {'issue': '26037', 'num': '420', 'sum': 6, 'span': 4, 'oe': '0奇3偶', 'bs': '0大3小', 'r012': '1:1:1', 'tail': 6, 'pc': '1质1合'}, {'issue': '26038', 'num': '467', 'sum': 17, 'span': 3, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:2:0', 'tail': 7, 'pc': '1质2合'}, {'issue': '26039', 'num': '450', 'sum': 9, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '1质1合'}, {'issue': '26040', 'num': '425', 'sum': 11, 'span': 3, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '0:1:2', 'tail': 1, 'pc': '2质1合'}, {'issue': '26041', 'num': '901', 'sum': 10, 'span': 9, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 0, 'pc': '0质1合'}, {'issue': '26042', 'num': '854', 'sum': 17, 'span': 4, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:1:2', 'tail': 7, 'pc': '1质2合'}, {'issue': '26043', 'num': '765', 'sum': 18, 'span': 2, 'oe': '2奇1偶', 'bs': '3大0小', 'r012': '1:1:1', 'tail': 8, 'pc': '2质1合'}, {'issue': '26044', 'num': '589', 'sum': 22, 'span': 4, 'oe': '2奇1偶', 'bs': '3大0小', 'r012': '1:0:2', 'tail': 2, 'pc': '1质2合'}, {'issue': '26045', 'num': '181', 'sum': 10, 'span': 7, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '0:2:1', 'tail': 0, 'pc': '0质1合'}, {'issue': '26046', 'num': '291', 'sum': 12, 'span': 8, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 2, 'pc': '1质1合'}, {'issue': '26047', 'num': '936', 'sum': 18, 'span': 6, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '3:0:0', 'tail': 8, 'pc': '1质2合'}, {'issue': '26048', 'num': '612', 'sum': 9, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '1质1合'}, {'issue': '26049', 'num': '110', 'sum': 2, 'span': 1, 'oe': '2奇1偶', 'bs': '0大3小', 'r012': '1:2:0', 'tail': 2, 'pc': '0质0合'}, {'issue': '26050', 'num': '689', 'sum': 23, 'span': 3, 'oe': '1奇2偶', 'bs': '3大0小', 'r012': '2:0:1', 'tail': 3, 'pc': '0质3合'}, {'issue': '26051', 'num': '302', 'sum': 5, 'span': 3, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '2:0:1', 'tail': 5, 'pc': '2质0合'}, {'issue': '26052', 'num': '277', 'sum': 16, 'span': 5, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '0:2:1', 'tail': 6, 'pc': '3质0合'}, {'issue': '26053', 'num': '755', 'sum': 17, 'span': 2, 'oe': '3奇0偶', 'bs': '3大0小', 'r012': '0:1:2', 'tail': 7, 'pc': '3质0合'}, {'issue': '26054', 'num': '217', 'sum': 10, 'span': 6, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '0:2:1', 'tail': 0, 'pc': '2质0合'}, {'issue': '26055', 'num': '107', 'sum': 8, 'span': 7, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '1:2:0', 'tail': 8, 'pc': '1质0合'}, {'issue': '26056', 'num': '477', 'sum': 18, 'span': 3, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '0:3:0', 'tail': 8, 'pc': '2质1合'}, {'issue': '26057', 'num': '264', 'sum': 12, 'span': 4, 'oe': '0奇3偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 2, 'pc': '1质2合'}, {'issue': '26058', 'num': '543', 'sum': 12, 'span': 2, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 2, 'pc': '2质1合'}, {'issue': '26059', 'num': '794', 'sum': 20, 'span': 5, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '1:2:0', 'tail': 0, 'pc': '1质2合'}, {'issue': '26060', 'num': '943', 'sum': 16, 'span': 6, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 6, 'pc': '1质2合'}, {'issue': '26061', 'num': '429', 'sum': 15, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 5, 'pc': '1质2合'}, {'issue': '26062', 'num': '294', 'sum': 15, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 5, 'pc': '1质2合'}, {'issue': '26063', 'num': '517', 'sum': 13, 'span': 6, 'oe': '3奇0偶', 'bs': '2大1小', 'r012': '0:2:1', 'tail': 3, 'pc': '2质0合'}, {'issue': '26064', 'num': '604', 'sum': 10, 'span': 6, 'oe': '0奇3偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 0, 'pc': '0质2合'}, {'issue': '26065', 'num': '057', 'sum': 12, 'span': 7, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 2, 'pc': '2质0合'}, {'issue': '26066', 'num': '934', 'sum': 16, 'span': 6, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 6, 'pc': '1质2合'}, {'issue': '26067', 'num': '695', 'sum': 20, 'span': 4, 'oe': '2奇1偶', 'bs': '3大0小', 'r012': '2:0:1', 'tail': 0, 'pc': '1质2合'}, {'issue': '26068', 'num': '706', 'sum': 13, 'span': 7, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '2:1:0', 'tail': 3, 'pc': '1质1合'}, {'issue': '26069', 'num': '908', 'sum': 17, 'span': 9, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '2:0:1', 'tail': 7, 'pc': '0质2合'}, {'issue': '26070', 'num': '484', 'sum': 16, 'span': 4, 'oe': '0奇3偶', 'bs': '1大2小', 'r012': '0:2:1', 'tail': 6, 'pc': '0质3合'}, {'issue': '26071', 'num': '261', 'sum': 9, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '1质1合'}, {'issue': '26072', 'num': '245', 'sum': 11, 'span': 3, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '0:1:2', 'tail': 1, 'pc': '2质1合'}, {'issue': '26073', 'num': '504', 'sum': 9, 'span': 5, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '1质1合'}, {'issue': '26074', 'num': '487', 'sum': 19, 'span': 4, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:2:1', 'tail': 9, 'pc': '1质2合'}, {'issue': '26075', 'num': '816', 'sum': 15, 'span': 7, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '0质2合'}, {'issue': '26076', 'num': '863', 'sum': 17, 'span': 5, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '2:0:1', 'tail': 7, 'pc': '1质2合'}, {'issue': '26077', 'num': '112', 'sum': 4, 'span': 1, 'oe': '2奇1偶', 'bs': '0大3小', 'r012': '0:2:1', 'tail': 4, 'pc': '1质0合'}, {'issue': '26078', 'num': '049', 'sum': 13, 'span': 9, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '2:1:0', 'tail': 3, 'pc': '0质2合'}, {'issue': '26079', 'num': '233', 'sum': 8, 'span': 1, 'oe': '2奇1偶', 'bs': '0大3小', 'r012': '2:0:1', 'tail': 8, 'pc': '3质0合'}, {'issue': '26080', 'num': '802', 'sum': 10, 'span': 8, 'oe': '0奇3偶', 'bs': '1大2小', 'r012': '1:0:2', 'tail': 0, 'pc': '1质1合'}, {'issue': '26081', 'num': '827', 'sum': 17, 'span': 6, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:1:2', 'tail': 7, 'pc': '2质1合'}, {'issue': '26082', 'num': '942', 'sum': 15, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 5, 'pc': '1质2合'}, {'issue': '26083', 'num': '506', 'sum': 11, 'span': 6, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '2:0:1', 'tail': 1, 'pc': '1质1合'}, {'issue': '26084', 'num': '456', 'sum': 15, 'span': 2, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '1质2合'}, {'issue': '26085', 'num': '118', 'sum': 10, 'span': 7, 'oe': '2奇1偶', 'bs': '1大2小', 'r012': '0:2:1', 'tail': 0, 'pc': '0质1合'}, {'issue': '26086', 'num': '382', 'sum': 13, 'span': 6, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:0:2', 'tail': 3, 'pc': '2质1合'}, {'issue': '26087', 'num': '911', 'sum': 11, 'span': 8, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '1:2:0', 'tail': 1, 'pc': '0质1合'}, {'issue': '26088', 'num': '608', 'sum': 14, 'span': 8, 'oe': '0奇3偶', 'bs': '2大1小', 'r012': '2:0:1', 'tail': 4, 'pc': '0质2合'}, {'issue': '26089', 'num': '922', 'sum': 13, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '1:0:2', 'tail': 3, 'pc': '2质1合'}, {'issue': '26090', 'num': '816', 'sum': 15, 'span': 7, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '0质2合'}, {'issue': '26091', 'num': '537', 'sum': 15, 'span': 4, 'oe': '3奇0偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '3质0合'}, {'issue': '26092', 'num': '870', 'sum': 15, 'span': 8, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '1:1:1', 'tail': 5, 'pc': '1质1合'}, {'issue': '26093', 'num': '518', 'sum': 14, 'span': 7, 'oe': '2奇1偶', 'bs': '2大1小', 'r012': '0:1:2', 'tail': 4, 'pc': '1质1合'}, {'issue': '26094', 'num': '418', 'sum': 13, 'span': 7, 'oe': '1奇2偶', 'bs': '1大2小', 'r012': '0:2:1', 'tail': 3, 'pc': '0质2合'}, {'issue': '26095', 'num': '022', 'sum': 4, 'span': 2, 'oe': '0奇3偶', 'bs': '0大3小', 'r012': '1:0:2', 'tail': 4, 'pc': '2质0合'}, {'issue': '26096', 'num': '689', 'sum': 23, 'span': 3, 'oe': '1奇2偶', 'bs': '3大0小', 'r012': '2:0:1', 'tail': 3, 'pc': '0质3合'}, {'issue': '26097', 'num': '818', 'sum': 17, 'span': 7, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:1:2', 'tail': 7, 'pc': '0质2合'}, {'issue': '26098', 'num': '513', 'sum': 9, 'span': 4, 'oe': '3奇0偶', 'bs': '1大2小', 'r012': '1:1:1', 'tail': 9, 'pc': '2质0合'}, {'issue': '26099', 'num': '877', 'sum': 22, 'span': 1, 'oe': '2奇1偶', 'bs': '3大0小', 'r012': '0:2:1', 'tail': 2, 'pc': '2质1合'}, {'issue': '26100', 'num': '414', 'sum': 9, 'span': 3, 'oe': '1奇2偶', 'bs': '0大3小', 'r012': '0:3:0', 'tail': 9, 'pc': '0质2合'}, {'issue': '26101', 'num': '584', 'sum': 17, 'span': 4, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '0:1:2', 'tail': 7, 'pc': '1质2合'}, {'issue': '26102', 'num': '420', 'sum': 6, 'span': 4, 'oe': '0奇3偶', 'bs': '0大3小', 'r012': '1:1:1', 'tail': 6, 'pc': '1质1合'}, {'issue': '26103', 'num': '661', 'sum': 13, 'span': 5, 'oe': '1奇2偶', 'bs': '2大1小', 'r012': '2:1:0', 'tail': 3, 'pc': '0质2合'}];
+const BAI_CANDS = [2, 1, 7];
+const SHI_CANDS = [1, 4, 5];
+const GE_CANDS = [5, 2, 4];
+const STRAIGHT_BETS = ['215', '212', '214', '245', '242', '244', '255', '252', '254', '115', '112', '114', '145', '142', '144', '155', '152', '154', '715', '712', '714', '745', '742', '744', '755', '752', '754'];
+const LATEST_ISSUE = "26103";
+const LATEST_NUM = "661";
+
+// ==================== 核心工具函数 ====================
+
+function pad3(n) { return String(n).padStart(3, '0'); }
+
+function parseNum(str) {
+  str = String(str).trim();
+  if (str.length === 1) return [0, 0, parseInt(str)];
+  if (str.length === 2) return [0, parseInt(str[0]), parseInt(str[1])];
+  return [parseInt(str[0]), parseInt(str[1]), parseInt(str[2])];
+}
+
+function classify(numStr) {
+  const [b, s, g] = parseNum(numStr);
+  if (b === s && s === g) return 'bz'; // 豹子
+  if (b === s || s === g || b === g) return 'z3'; // 组三
+  return 'z6'; // 组六
+}
+
+function span(numStr) {
+  const digits = parseNum(numStr);
+  return Math.max(...digits) - Math.min(...digits);
+}
+
+function sumValue(numStr) {
+  return parseNum(numStr).reduce((a, b) => a + b, 0);
+}
+
+function tail(n) { return n % 10; }
+
+function getPairs(numStr) {
+  const [b, s, g] = parseNum(numStr);
+  return [pad3(b*10+s), pad3(b*10+g), pad3(s*10+g)];
+}
+
+// 胆码映射表
+const DAN_MAP = {
+  '00': ['0','5'], '11': ['0','5'], '22': ['1','6'], '33': ['4','6','0','8'],
+  '44': ['2','7'], '55': ['4','9'], '66': ['0','9'], '77': ['0','5'],
+  '88': ['2','3'], '99': ['0','7']
+};
+
+// 万能七码
+const SEVEN_CODES = {
+  'A': { nums: '0123489', color: 'blue' },
+  'B': { nums: '0156789', color: 'purple' },
+  'C': { nums: '0245678', color: 'green' },
+  'D': { nums: '0345679', color: 'orange' },
+  'E': { nums: '1234567', color: 'red' },
+  'F': { nums: '2356789', color: 'blue' }
+};
+
+// 万能组合 (两码)
+const WAN_NENG = [
+  { name: '组合1', pairs: ['02','04','05','07','09'] },
+  { name: '组合2', pairs: ['24','25','27','29'] },
+  { name: '组合3', pairs: ['45','47','49'] },
+  { name: '组合4', pairs: ['57','59','79'] },
+  { name: '组合5', pairs: ['13','16','18'] },
+  { name: '组合6', pairs: ['36','38','68'] }
+];
+
+// 9条规则定义
+const RULES = [
+  { id: 1, name: '百位定后两位', cond: (b,s,g) => b===6 && [50,51,53].includes(s*10+g), result: '未来1-3期关注特定后两位' },
+  { id: 2, name: '百位8定胆5', cond: (b,s,g) => b===8 && [s,g].includes(5), result: '包含胆码5' },
+  { id: 3, name: '百位9定胆2', cond: (b,s,g) => b===9 && [s,g].includes(2), result: '包含胆码2' },
+  { id: 4, name: '十位3定胆', cond: (b,s,g) => s===3 && ([s,g].includes(2) || [s,g].includes(9)), result: '包含胆码2或9' },
+  { id: 5, name: '十位0出组三', cond: (b,s,g) => s===0 && (b===s || s===g || b===g), result: '出现组三' },
+  { id: 6, name: '组三跨度9', cond: (b,s,g) => (b===s || s===g || b===g) && Math.max(b,s,g)-Math.min(b,s,g)===9, result: '跨度=9' },
+  { id: 7, name: '十位1冷码回补', cond: (b,s,g) => s===1 && [b,s,g].includes(8), result: '冷码8回补' },
+  { id: 8, name: '百位0定胆', cond: (b,s,g) => b===0 && ([s,g].includes(4) || [s,g].includes(5) || s===5), result: '包含胆码4或5，或十位=5' },
+  { id: 9, name: '百位5定胆', cond: (b,s,g) => b===5 && ([s,g].includes(4) || [s,g].includes(7)), result: '包含胆码4或7' }
+];
+
+// ==================== UI 切换 ====================
+
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// ==================== 模块1: 号码生成器 ====================
+
+let selectedInclude = new Set();
+let selectedExclude = new Set();
+let currentNumbers = [];
+
+function toggleDigit(btn) {
+  const d = btn.dataset.d;
+  if (selectedInclude.has(d)) { selectedInclude.delete(d); btn.classList.remove('active'); }
+  else { selectedInclude.add(d); btn.classList.add('active'); }
+}
+
+function toggleExclude(btn) {
+  const d = btn.dataset.d;
+  if (selectedExclude.has(d)) { selectedExclude.delete(d); btn.classList.remove('active'); }
+  else { selectedExclude.add(d); btn.classList.add('active'); }
+}
+
+function generateNumbers() {
+  const smin = parseInt(document.getElementById('f-span-min').value) || 0;
+  const smax = parseInt(document.getElementById('f-span-max').value) || 9;
+  const sumin = parseInt(document.getElementById('f-sum-min').value) || 0;
+  const sumax = parseInt(document.getElementById('f-sum-max').value) || 27;
+  const typeFilter = document.getElementById('f-type').value;
+
+  currentNumbers = [];
+  for (let i = 0; i <= 999; i++) {
+    const ns = pad3(i);
+    const t = classify(ns);
+    const sp = span(ns);
+    const su = sumValue(ns);
+
+    if (sp < smin || sp > smax) continue;
+    if (su < sumin || su > sumax) continue;
+    if (typeFilter !== 'all' && t !== typeFilter) continue;
+
+    const digits = parseNum(ns);
+    if (selectedExclude.size > 0) {
+      if (digits.some(d => selectedExclude.has(String(d)))) continue;
+    }
+    if (selectedInclude.size > 0) {
+      if (!digits.some(d => selectedInclude.has(String(d)))) continue;
+    }
+
+    currentNumbers.push({ num: ns, type: t, span: sp, sum: su });
+  }
+
+  renderNumbers();
+}
+
+function renderNumbers() {
+  const grid = document.getElementById('number-grid');
+  const countEl = document.getElementById('result-count');
+  countEl.textContent = `(共 ${currentNumbers.length} 注)`;
+
+  const typeColors = { z6: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+                       z3: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+                       bz: 'text-orange-400 border-orange-500/30 bg-orange-500/10' };
+
+  grid.innerHTML = currentNumbers.map(item => {
+    const tc = typeColors[item.type] || 'text-slate-400';
+    const label = item.type==='z6'?'组六':item.type==='z3'?'组三':'豹子';
+    return `<div class="${tc} border rounded-lg px-2 py-1.5 text-center text-xs font-mono cursor-default hover:brightness-110 transition-all" title="${label} 跨度${item.span} 和值${item.sum}">
+      <div class="font-bold text-sm">${item.num}</div>
+      <div class="text-[10px] opacity-70 mt-0.5">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function copyResults() {
+  const text = currentNumbers.map(n => n.num).join(', ');
+  navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板'));
+}
+
+function exportCSV() {
+  let csv = '号码,类型,跨度,和值\n';
+  currentNumbers.forEach(n => {
+    const t = n.type==='z6'?'组六':n.type==='z3'?'组三':'豹子';
+    csv += `${n.num},${t},${n.span},${n.sum}\n`;
+  });
+  const blob = new Blob(['\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '号码生成结果.csv';
+  link.click();
+}
+
+// ==================== 模块2: 走势分析 ====================
+
+function analyzeTrend() {
+  const h1 = document.getElementById('trend-h1').value.trim();
+  const h2 = document.getElementById('trend-h2').value.trim();
+  const h3 = document.getElementById('trend-h3').value.trim();
+
+  if (!h1 || !h2 || !h3) {
+    alert('请输入完整的三期号码');
+    return;
+  }
+
+  const n1 = parseNum(h1), n2 = parseNum(h2), n3 = parseNum(h3);
+
+  // 每位三期相加取尾
+  const bTail = tail(n1[0] + n2[0] + n3[0]);
+  const sTail = tail(n1[1] + n2[1] + n3[1]);
+  const gTail = tail(n1[2] + n2[2] + n3[2]);
+
+  // 任两码和差 (三个尾数)
+  let diffs = [bTail, sTail, gTail];
+  let extraDiffs = [];
+  if (bTail === sTail) extraDiffs.push(tail(bTail + sTail));
+  if (bTail === gTail) extraDiffs.push(tail(bTail + gTail));
+  if (sTail === gTail) extraDiffs.push(tail(sTail + gTail));
+
+  // 跨度走势
+  const spans = [span(h1), span(h2), span(h3)];
+  const sums = [sumValue(h1), sumValue(h2), sumValue(h3)];
+
+  // 预测
+  const lastSpan = spans[spans.length - 1];
+  const spanPrediction = lastSpan <= 2
+    ? '极小跨度出现，下期关注中大跨度回调（4-8区间）'
+    : lastSpan >= 4 && lastSpan <= 8
+      ? '跨度在4-8区间震荡，下期可能继续震荡或关注缺失的小跨度回调'
+      : '跨度偏大，下期可能向中区收敛';
+
+  const container = document.getElementById('trend-results');
+  container.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="glass rounded-xl p-4">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">📊 基础走势</h4>
+        <table class="w-full text-sm">
+          <thead class="text-slate-500 text-xs"><tr><th class="text-left py-1">期号</th><th class="text-center">号码</th><th class="text-center">跨度</th><th class="text-center">和值</th><th class="text-center">类型</th></tr></thead>
+          <tbody class="text-slate-300">
+            <tr class="border-b border-slate-800"><td class="py-2">第一期</td><td class="text-center font-mono">${pad3(h1)}</td><td class="text-center">${spans[0]}</td><td class="text-center">${sums[0]}</td><td class="text-center">${classifyName(h1)}</td></tr>
+            <tr class="border-b border-slate-800"><td class="py-2">第二期</td><td class="text-center font-mono">${pad3(h2)}</td><td class="text-center">${spans[1]}</td><td class="text-center">${sums[1]}</td><td class="text-center">${classifyName(h2)}</td></tr>
+            <tr><td class="py-2">第三期(最近)</td><td class="text-center font-mono font-bold text-blue-400">${pad3(h3)}</td><td class="text-center font-bold text-blue-400">${spans[2]}</td><td class="text-center font-bold text-blue-400">${sums[2]}</td><td class="text-center">${classifyName(h3)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="glass rounded-xl p-4">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">🎯 任两码和差预测</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between py-1.5 border-b border-slate-800"><span class="text-slate-400">百位三期和尾</span><span class="font-mono font-bold">${n1[0]}+${n2[0]}+${n3[0]}=${n1[0]+n2[0]+n3[0]} → <span class="text-blue-400">${bTail}</span></span></div>
+          <div class="flex justify-between py-1.5 border-b border-slate-800"><span class="text-slate-400">十位三期和尾</span><span class="font-mono font-bold">${n1[1]}+${n2[1]}+${n3[1]}=${n1[1]+n2[1]+n3[1]} → <span class="text-blue-400">${sTail}</span></span></div>
+          <div class="flex justify-between py-1.5 border-b border-slate-800"><span class="text-slate-400">个位三期和尾</span><span class="font-mono font-bold">${n1[2]}+${n2[2]}+${n3[2]}=${n1[2]+n2[2]+n3[2]} → <span class="text-blue-400">${gTail}</span></span></div>
+          <div class="mt-3 p-3 rounded-lg bg-slate-800/50">
+            <div class="text-xs text-slate-500 mb-1">下期任两码和差参考值</div>
+            <div class="flex gap-2">
+              ${diffs.map(d => `<span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg font-bold font-mono">${d}</span>`).join('')}
+              ${extraDiffs.length ? extraDiffs.map(d => `<span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg font-bold font-mono">${d}（重复生成）</span>`).join('') : ''}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-4">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">📐 跨度走势分析</h4>
+        <div class="flex items-center gap-2 mb-3">
+          ${spans.map((sp, i) => `<span class="px-2 py-1 bg-slate-800 rounded text-xs font-mono">${sp}</span>${i < spans.length-1 ? '<span class="text-slate-600">→</span>' : ''}`).join('')}
+        </div>
+        <div class="text-xs text-slate-400 mb-1">分布区间</div>
+        <div class="w-full bg-slate-800 rounded-full h-2 mb-3 relative">
+          <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style="width: ${(lastSpan/9)*100}%"></div>
+        </div>
+        <div class="highlight p-3 rounded-lg text-sm text-slate-200">${spanPrediction}</div>
+      </div>
+
+      <div class="glass rounded-xl p-4">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">💡 综合建议</h4>
+        <div class="space-y-2 text-sm text-slate-300">
+          <div class="flex gap-2"><span class="text-blue-400">•</span> 关注跨度区间: ${Math.max(0, lastSpan-1)} - ${Math.min(9, lastSpan+1)}</div>
+          <div class="flex gap-2"><span class="text-blue-400">•</span> 关注和值附近: ${sums[2]-2} ~ ${sums[2]+2}</div>
+          <div class="flex gap-2"><span class="text-blue-400">•</span> 任两码和差重点: ${[...diffs, ...extraDiffs].join(', ')}</div>
+          ${classify(h3)==='z3' ? `<div class="flex gap-2"><span class="text-orange-400">•</span> <b>上期组三！注意对子胆码映射</b></div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function classifyName(str) {
+  const c = classify(str);
+  return c==='z6'?'组六':c==='z3'?'组三':'豹子';
+}
+
+// ==================== 模块3: 胆码预测 ====================
+
+function initDanMap() {
+  const container = document.getElementById('dan-map');
+  container.innerHTML = Object.entries(DAN_MAP).map(([pair, codes]) => `
+    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50 border border-slate-700">
+      <span class="font-mono font-bold text-purple-400">${pair}</span>
+      <span class="text-xs text-slate-400">→</span>
+      <div class="flex gap-1">${codes.map(c => `<span class="w-6 h-6 flex items-center justify-center bg-blue-500/20 text-blue-400 rounded text-xs font-bold">${c}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+function predictDan() {
+  const val = document.getElementById('dan-input').value.trim();
+  if (!val || val.length < 2) { alert('请输入有效的3位号码'); return; }
+  const ns = pad3(val);
+  const [b,s,g] = parseNum(ns);
+  const type = classify(ns);
+
+  const resultDiv = document.getElementById('dan-result');
+  const typeDiv = document.getElementById('dan-type');
+  const codesDiv = document.getElementById('dan-codes');
+
+  resultDiv.classList.remove('hidden');
+  typeDiv.innerHTML = `<span class="tag ${type==='z6'?'tag-blue':type==='z3'?'tag-purple':'tag-orange'}">${type==='z6'?'组六':type==='z3'?'组三':'豹子'}</span>`;
+
+  let codes = [];
+  if (type === 'z3') {
+    // 找到对子
+    let pair = '';
+    if (b===s) pair = String(b)+String(s);
+    else if (s===g) pair = String(s)+String(g);
+    else if (b===g) pair = String(b)+String(g);
+    codes = DAN_MAP[pair] || [];
+  } else if (type === 'bz') {
+    codes = DAN_MAP[String(b)+String(b)] || [];
+  } else {
+    codes = ['组六暂无线性胆码映射，建议结合走势分析'];
+  }
+
+  codesDiv.innerHTML = codes.length === 0
+    ? '<span class="text-slate-500">无明确胆码映射</span>'
+    : (typeof codes[0] === 'string' && codes[0].length > 1
+        ? `<span class="text-orange-400 text-sm">${codes[0]}</span>`
+        : codes.map(c => `<span class="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg font-bold font-mono text-lg">${c}</span>`).join(''));
+}
+
+// ==================== 模块4: 万能七码 ====================
+
+function initSevenCodes() {
+  const container = document.getElementById('seven-groups');
+  const colors = { blue: 'border-blue-500/30 bg-blue-500/5', purple: 'border-purple-500/30 bg-purple-500/5', green: 'border-green-500/30 bg-green-500/5', orange: 'border-orange-500/30 bg-orange-500/5', red: 'border-red-500/30 bg-red-500/5' };
+  container.innerHTML = Object.entries(SEVEN_CODES).map(([name, item]) => `
+    <div class="glass rounded-xl p-4 border ${colors[item.color] || colors.blue}">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-lg font-bold ${item.color==='blue'?'text-blue-400':item.color==='purple'?'text-purple-400':item.color==='green'?'text-green-400':item.color==='orange'?'text-orange-400':'text-red-400'}">${name}组</span>
+        <span class="text-xs text-slate-500">7码</span>
+      </div>
+      <div class="flex gap-1.5 flex-wrap">
+        ${item.nums.split('').map(n => `<span class="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-lg text-sm font-bold font-mono text-slate-200">${n}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function matchSeven() {
+  const val = document.getElementById('seven-input').value.trim();
+  if (!val) return;
+  const digits = parseNum(pad3(val));
+  const uniqueDigits = [...new Set(digits)].sort();
+
+  const matches = [];
+  Object.entries(SEVEN_CODES).forEach(([name, item]) => {
+    const set = new Set(item.nums.split(''));
+    if (digits.every(d => set.has(String(d)))) matches.push(name);
+  });
+
+  const result = document.getElementById('seven-result');
+  const numSpan = document.getElementById('seven-num');
+  const matchesDiv = document.getElementById('seven-matches');
+
+  result.classList.remove('hidden');
+  numSpan.textContent = pad3(val);
+  matchesDiv.innerHTML = matches.length === 0
+    ? '<span class="text-slate-500 text-sm">未命中任何分组</span>'
+    : matches.map(m => `<span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold">${m}组</span>`).join('');
+}
+
+
+
+// ==================== 模块5: 规则引擎 ====================
+
+function runRules() {
+  const b = parseInt(document.getElementById('r-bai').value);
+  const s = parseInt(document.getElementById('r-shi').value);
+  const g = parseInt(document.getElementById('r-ge').value);
+
+  if ([b,s,g].some(v => isNaN(v) || v < 0 || v > 9)) {
+    alert('请输入0-9的有效数字');
+    return;
+  }
+
+  const container = document.getElementById('rules-results');
+  const triggered = RULES.filter(r => r.cond(b,s,g));
+
+  if (triggered.length === 0) {
+    container.innerHTML = `
+      <div class="glass rounded-xl p-8 text-center">
+        <div class="text-4xl mb-3">🔍</div>
+        <div class="text-slate-300 font-medium">当前号码 ${b}${s}${g} 未触发任何预测规则</div>
+        <div class="text-sm text-slate-500 mt-2">可尝试修改号码或查看历史号码触发记录</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = triggered.map(r => `
+    <div class="rule-triggered glass rounded-xl p-4 flex items-start gap-4">
+      <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+        <span class="text-green-400 font-bold text-sm">${r.id}</span>
+      </div>
+      <div class="flex-1">
+        <div class="flex justify-between items-start">
+          <div class="font-medium text-white">${r.name}</div>
+          <span class="tag tag-green">已触发</span>
+        </div>
+        <div class="text-sm text-slate-400 mt-1">${r.result}</div>
+      </div>
+    </div>
+  `).join('') + `
+    <div class="glass rounded-xl p-4 mt-4">
+      <div class="text-sm text-slate-300">
+        <span class="font-semibold text-white">综合预测：</span>
+        号码 <span class="font-mono font-bold text-blue-400">${b}${s}${g}</span> 触发了 ${triggered.length} 条规则，
+        建议未来1-3期关注上述特征。同时可结合走势分析与胆码映射交叉验证。
+      </div>
+    </div>
+  `;
+}
+
+// ==================== 模块6: 跨度分析 ====================
+
+function analyzeSpan() {
+  const input = document.getElementById('span-input').value.trim();
+  if (!input) { alert('请输入跨度序列'); return; }
+
+  const spans = input.split(/[,，\s]+/).map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n >= 0 && n <= 9);
+  if (spans.length < 3) { alert('至少需要3个跨度数据'); return; }
+
+  const last = spans[spans.length - 1];
+  const freq = {};
+  spans.forEach(s => freq[s] = (freq[s] || 0) + 1);
+
+  // 分布区间统计
+  const small = spans.filter(s => s >= 0 && s <= 3).length;
+  const mid = spans.filter(s => s >= 4 && s <= 6).length;
+  const large = spans.filter(s => s >= 7 && s <= 9).length;
+
+  // 缺失值
+  const allSpans = [0,1,2,3,4,5,6,7,8,9];
+  const missing = allSpans.filter(s => !spans.includes(s));
+
+  // 趋势判断
+  const recent = spans.slice(-5);
+  let trendText = '';
+  if (recent.every(s => s >= 4 && s <= 8)) {
+    trendText = '近期跨度全部落在4-8区间，呈中大跨度震荡走势。';
+  } else if (recent.filter(s => s <= 2).length >= 2) {
+    trendText = '近期极小跨度频繁出现，注意向中区回归。';
+  } else {
+    trendText = '跨度走势无明显聚集，需结合和值综合判断。';
+  }
+
+  // 回调预测
+  const missingSmall = missing.filter(s => s <= 3);
+  const callbackTip = missingSmall.length > 0
+    ? `长期缺失的小跨度 [${missingSmall.join(', ')}] 存在回调风险，建议防范。`
+    : '小跨度近期均有出现，暂无明确回调信号。';
+
+  const container = document.getElementById('span-results');
+  container.innerHTML = `
+    <div class="glass rounded-xl p-5">
+      <h4 class="text-sm font-semibold text-slate-200 mb-4">📊 跨度统计分布</h4>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs text-slate-400 mb-1"><span>小跨度 (0-3)</span><span>${small}次 (${(small/spans.length*100).toFixed(1)}%)</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2"><div class="bg-blue-500 h-full rounded-full transition-all" style="width: ${small/spans.length*100}%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs text-slate-400 mb-1"><span>中跨度 (4-6)</span><span>${mid}次 (${(mid/spans.length*100).toFixed(1)}%)</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2"><div class="bg-purple-500 h-full rounded-full transition-all" style="width: ${mid/spans.length*100}%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs text-slate-400 mb-1"><span>大跨度 (7-9)</span><span>${large}次 (${(large/spans.length*100).toFixed(1)}%)</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2"><div class="bg-orange-500 h-full rounded-full transition-all" style="width: ${large/spans.length*100}%"></div></div>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <div class="text-xs text-slate-500 mb-2">跨度走势序列</div>
+        <div class="flex flex-wrap gap-2">
+          ${spans.map((sp, i) => `
+            <div class="flex items-center gap-1">
+              <span class="px-2 py-1 rounded-lg text-xs font-mono font-bold ${i===spans.length-1?'bg-blue-500/20 text-blue-400':'bg-slate-800 text-slate-400'}">${sp}</span>
+              ${i < spans.length-1 ? `<span class="text-slate-600 text-xs">${sp < spans[i+1] ? '↑' : sp > spans[i+1] ? '↓' : '→'}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="glass rounded-xl p-5">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">📈 走势判断</h4>
+        <div class="highlight p-3 rounded-lg text-sm text-slate-200 mb-3">${trendText}</div>
+        <div class="text-xs text-slate-500 mb-2">各跨度出现频次</div>
+        <div class="grid grid-cols-5 gap-2">
+          ${allSpans.map(s => `
+            <div class="text-center p-2 rounded-lg ${freq[s] ? 'bg-slate-800' : 'bg-red-500/10 border border-red-500/20'}">
+              <div class="font-mono font-bold ${freq[s] ? 'text-slate-300' : 'text-red-400'}">${s}</div>
+              <div class="text-[10px] ${freq[s] ? 'text-slate-500' : 'text-red-400'}">${freq[s] || '缺失'}次</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-5">
+        <h4 class="text-sm font-semibold text-slate-200 mb-3">⚠️ 回调预警</h4>
+        <div class="highlight p-3 rounded-lg text-sm text-slate-200">${callbackTip}</div>
+        <div class="mt-3 text-sm text-slate-400">
+          <div class="mb-1"><span class="text-blue-400">→</span> 当前跨度: <span class="font-mono font-bold text-white">${last}</span></div>
+          <div><span class="text-blue-400">→</span> 建议下期关注区间: <span class="font-mono font-bold text-white">${Math.max(0, last-2)} - ${Math.min(9, last+2)}</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ==================== 模块7: 万能组合 ====================
+
+function initWanneng() {
+  const container = document.getElementById('wanneng-groups');
+  container.innerHTML = WAN_NENG.map((g, i) => `
+    <div class="glass rounded-xl p-4">
+      <div class="flex justify-between items-center mb-3">
+        <span class="font-semibold text-slate-200">${g.name}</span>
+        <span class="text-xs text-slate-500">${g.pairs.length}组两码</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        ${g.pairs.map(p => `<span class="px-2 py-1 bg-slate-800 rounded text-xs font-mono text-slate-300">${p}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function matchWanneng() {
+  const val = document.getElementById('wn-input').value.trim();
+  if (!val) return;
+  const [b, s, g] = parseNum(pad3(val));
+  const pairs = [`${b}${s}`, `${b}${g}`, `${s}${g}`];
+  const reversePairs = pairs.map(p => p[1]+p[0]);
+
+  const result = document.getElementById('wn-result');
+  const pairsDiv = document.getElementById('wn-pairs');
+  const matchesDiv = document.getElementById('wn-matches');
+
+  result.classList.remove('hidden');
+  pairsDiv.innerHTML = pairs.map((p, i) => `
+    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm font-mono text-slate-300">${p}</span>
+  `).join('');
+
+  const hits = [];
+  WAN_NENG.forEach(g => {
+    const allPairs = [...g.pairs, ...g.pairs.map(p => p[1]+p[0])];
+    if (pairs.some(p => allPairs.includes(p))) hits.push(g.name);
+  });
+
+  matchesDiv.innerHTML = hits.length === 0
+    ? '<span class="text-slate-500 text-sm">未命中任何组合</span>'
+    : hits.map(h => `<span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-bold">${h}</span>`).join('');
+}
+
+
+// ==================== 3D数据看板 ====================
+
+function init3DDataPanel() {
+  // Basic info
+  document.getElementById('latest-issue').textContent = LATEST_ISSUE;
+  document.getElementById('latest-num').textContent = LATEST_NUM.split('').join(' ');
+  document.getElementById('total-count').textContent = LOTTERY_DATA.length;
+  document.getElementById('data-range').textContent = LOTTERY_DATA[0].issue + ' ~ ' + LOTTERY_DATA[LOTTERY_DATA.length-1].issue;
+
+  // Bet recommendations
+  const betContainer = document.getElementById('bet-recommendations');
+  let betHTML = '';
+
+  // Straight bets
+  betHTML += `<div class="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+    <div class="text-xs text-slate-500 mb-2">直选号码组合 (27注)</div>
+    <div class="text-xs text-slate-400 mb-2">百位: ${BAI_CANDS.join(', ')} | 十位: ${SHI_CANDS.join(', ')} | 个位: ${GE_CANDS.join(', ')}</div>
+    <div class="flex flex-wrap gap-1.5">${STRAIGHT_BETS.map(n => `<span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold font-mono">${n}</span>`).join('')}</div>
+  </div>`;
+
+  // Missing alerts
+  const missingAlerts = [];
+  const posNames = {bai:'百位', shi:'十位', ge:'个位'};
+  for (const pos of ['bai','shi','ge']) {
+    for (let num = 0; num <= 9; num++) {
+      const info = MISSING_DATA[pos][num];
+      if (info.current > info.max) {
+        missingAlerts.push(`<span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs font-bold">${posNames[pos]} ${num}: 遗漏${info.current}期(超最大${info.max})</span>`);
+      } else if (info.current >= 15) {
+        missingAlerts.push(`<span class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs font-bold">${posNames[pos]} ${num}: 遗漏${info.current}期</span>`);
+      }
+    }
+  }
+  betHTML += `<div class="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+    <div class="text-xs text-slate-500 mb-2">遗漏预警</div>
+    <div class="flex flex-wrap gap-1.5">${missingAlerts.join('') || '<span class="text-xs text-slate-500">暂无大遗漏号码</span>'}</div>
+  </div>`;
+
+  // Hot numbers
+  let hotHTML = '';
+  for (const pos of ['bai','shi','ge']) {
+    const h = HOT_DATA[pos].hot;
+    const c = HOT_DATA[pos].cold;
+    if (h.length || c.length) {
+      hotHTML += `<div class="mb-2"><span class="text-xs text-slate-400">${posNames[pos]}:</span> `;
+      if (h.length) hotHTML += `<span class="text-xs text-blue-400">热号 ${h.join(', ')}</span> `;
+      if (c.length) hotHTML += `<span class="text-xs text-slate-500">冷号 ${c.join(', ')}</span>`;
+      hotHTML += `</div>`;
+    }
+  }
+  betHTML += `<div class="p-4 rounded-lg bg-green-500/5 border border-green-500/20 lg:col-span-2">
+    <div class="text-xs text-slate-500 mb-2">冷热号分布</div>
+    ${hotHTML || '<span class="text-xs text-slate-500">暂无数据</span>'}
+  </div>`;
+
+  betContainer.innerHTML = betHTML;
+
+  // Missing grid
+  function renderMissingGrid(pos, containerId) {
+    const container = document.getElementById(containerId);
+    const items = Object.entries(MISSING_DATA[pos]).sort((a,b) => b[1].current - a[1].current);
+    container.innerHTML = items.map(([num, info]) => {
+      const isAlert = info.current > info.max;
+      const isHigh = info.current >= 15;
+      const bg = isAlert ? 'bg-red-500/20 border-red-500/30 text-red-400' : isHigh ? 'bg-orange-500/20 border-orange-500/30 text-orange-400' : 'bg-slate-800 border-slate-700 text-slate-300';
+      return `<div class="${bg} border rounded-lg p-2 text-center">
+        <div class="text-sm font-bold">${num}</div>
+        <div class="text-[10px] opacity-70">${info.current}期</div>
+      </div>`;
+    }).join('');
+  }
+  renderMissingGrid('bai', 'miss-bai');
+  renderMissingGrid('shi', 'miss-shi');
+  renderMissingGrid('ge', 'miss-ge');
+
+  // Stats table (last 20)
+  const tableBody = document.getElementById('stats-table');
+  const last20 = STATS_DATA.slice(-20).reverse();
+  tableBody.innerHTML = last20.map(s => `
+    <tr class="border-b border-slate-800">
+      <td class="py-2 font-mono">${s.issue}</td>
+      <td class="text-center font-bold text-white">${s.num.split('').join(' ')}</td>
+      <td class="text-center">${s.sum}</td>
+      <td class="text-center">${s.span}</td>
+      <td class="text-center">${s.oe}</td>
+      <td class="text-center">${s.bs}</td>
+      <td class="text-center font-mono text-xs">${s.r012}</td>
+      <td class="text-center">${s.tail}</td>
+      <td class="text-center">${s.pc}</td>
+    </tr>
+  `).join('');
+
+  // History grid (all data, reversed newest first)
+  const historyGrid = document.getElementById('history-grid');
+  const reversed = [...LOTTERY_DATA].reverse();
+  historyGrid.innerHTML = reversed.map(d => {
+    const n = d.num;
+    const type = n[0]===n[1] && n[1]===n[2] ? 'bz' : n[0]===n[1] || n[1]===n[2] || n[0]===n[2] ? 'z3' : 'z6';
+    const typeColors = { z6: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+                         z3: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+                         bz: 'text-orange-400 border-orange-500/30 bg-orange-500/10' };
+    const label = type==='z6'?'组六':type==='z3'?'组三':'豹子';
+    return `<div class="${typeColors[type]} border rounded-lg px-2 py-1.5 text-center text-xs cursor-default hover:brightness-110 transition-all" title="期号${d.issue} ${label}">
+      <div class="font-bold text-sm font-mono">${n}</div>
+      <div class="text-[10px] opacity-70">${d.issue}</div>
+    </div>`;
+  }).join('');
+}
+
+
+// ==================== 初始化 ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 初始化3D数据看板
+  init3DDataPanel();
+  // 初始化号码生成器
+  generateNumbers();
+
+  // 初始化胆码映射表
+  initDanMap();
+
+  // 初始化万能七码
+  initSevenCodes();
+
+  // 初始化万能组合
+  initWanneng();
+
+  // 输入框回车触发
+  document.getElementById('dan-input')?.addEventListener('keypress', e => { if(e.key==='Enter') predictDan(); });
+  document.getElementById('seven-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchSeven(); });
+  document.getElementById('wn-input')?.addEventListener('keypress', e => { if(e.key==='Enter') matchWanneng(); });
+  document.getElementById('span-input')?.addEventListener('keypress', e => { if(e.key==='Enter') analyzeSpan(); });
+
+  ['trend-h1','trend-h2','trend-h3'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '').slice(0,3);
+    });
+  });
 });
 
-// 遗漏期数 - 十位
-var missShi = echarts.init(document.getElementById('missShi'));
-missShi.setOption({
-    title: { text: '十位遗漏期数', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] },
-    yAxis: { type: 'value', name: '遗漏期数' },
-    series: [{ data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100], type: 'bar', itemStyle: { color: function(p) { return p.value > 20 ? '#c41e3a' : '#91cc75'; } } }]
-});
-
-// 遗漏期数 - 个位
-var missGe = echarts.init(document.getElementById('missGe'));
-missGe.setOption({
-    title: { text: '个位遗漏期数', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] },
-    yAxis: { type: 'value', name: '遗漏期数' },
-    series: [{ data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100], type: 'bar', itemStyle: { color: function(p) { return p.value > 20 ? '#c41e3a' : '#fac858'; } } }]
-});
-
-// 和值走势
-var sumTrend = echarts.init(document.getElementById('sumTrend'));
-sumTrend.setOption({
-    title: { text: '和值走势', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ["26074", "26075", "26076", "26077", "26078", "26079", "26080", "26081", "26082", "26083", "26084", "26085", "26086", "26087", "26088", "26089", "26090", "26091", "26092", "26093", "26094", "26095", "26096", "26097", "26098", "26099", "26100", "26101", "26102", "26103"], axisLabel: { rotate: 45 } },
-    yAxis: { type: 'value', name: '和值', min: 0, max: 27 },
-    series: [{ data: [19, 15, 17, 4, 13, 8, 10, 17, 15, 11, 15, 10, 13, 11, 14, 13, 15, 15, 15, 14, 13, 4, 23, 17, 9, 22, 9, 17, 6, 13], type: 'line', smooth: true, itemStyle: { color: '#c41e3a' }, areaStyle: { opacity: 0.1 } }]
-});
-
-// 跨度走势
-var spanTrend = echarts.init(document.getElementById('spanTrend'));
-spanTrend.setOption({
-    title: { text: '跨度走势', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ["26074", "26075", "26076", "26077", "26078", "26079", "26080", "26081", "26082", "26083", "26084", "26085", "26086", "26087", "26088", "26089", "26090", "26091", "26092", "26093", "26094", "26095", "26096", "26097", "26098", "26099", "26100", "26101", "26102", "26103"], axisLabel: { rotate: 45 } },
-    yAxis: { type: 'value', name: '跨度', min: 0, max: 9 },
-    series: [{ data: [4, 7, 5, 1, 9, 1, 8, 6, 7, 6, 2, 7, 6, 8, 8, 7, 7, 4, 8, 7, 7, 2, 3, 7, 4, 1, 3, 4, 4, 5], type: 'line', smooth: true, itemStyle: { color: '#5470c6' } }]
-});
-
-// 和值分布
-var sumDist = echarts.init(document.getElementById('sumDist'));
-sumDist.setOption({
-    title: { text: '和值分布', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27] },
-    yAxis: { type: 'value', name: '次数' },
-    series: [{ data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], type: 'bar', itemStyle: { color: '#c41e3a' } }]
-});
-
-// 跨度分布
-var spanDist = echarts.init(document.getElementById('spanDist'));
-spanDist.setOption({
-    title: { text: '跨度分布', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
-    yAxis: { type: 'value', name: '次数' },
-    series: [{ data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], type: 'bar', itemStyle: { color: '#5470c6' } }]
-});
-
-// 和尾分布
-var tailDist = echarts.init(document.getElementById('tailDist'));
-tailDist.setOption({
-    title: { text: '和尾分布', left: 'center' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
-    yAxis: { type: 'value', name: '次数' },
-    series: [{ data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], type: 'bar', itemStyle: { color: '#91cc75' } }]
-});
-
-// 奇偶分布
-var oeDist = echarts.init(document.getElementById('oeDist'));
-oeDist.setOption({
-    title: { text: '奇偶比分布', left: 'center' },
-    tooltip: { trigger: 'item' },
-    series: [{ type: 'pie', radius: '60%', data: [{"name": "2\u59471\u5076", "value": 28}, {"name": "1\u59472\u5076", "value": 53}, {"name": "0\u59473\u5076", "value": 9}, {"name": "3\u59470\u5076", "value": 10}] }]
-});
-
-// 大小分布
-var bsDist = echarts.init(document.getElementById('bsDist'));
-bsDist.setOption({
-    title: { text: '大小比分布', left: 'center' },
-    tooltip: { trigger: 'item' },
-    series: [{ type: 'pie', radius: '60%', data: [{"name": "1\u59272\u5c0f", "value": 42}, {"name": "2\u59271\u5c0f", "value": 32}, {"name": "0\u59273\u5c0f", "value": 15}, {"name": "3\u59270\u5c0f", "value": 11}] }]
-});
-
-// 012路分布
-var r012Dist = echarts.init(document.getElementById('r012Dist'));
-r012Dist.setOption({
-    title: { text: '012路分布', left: 'center' },
-    tooltip: { trigger: 'item' },
-    series: [{ type: 'pie', radius: '60%', data: [{"name": "2:1:0", "value": 10}, {"name": "1:2:0", "value": 11}, {"name": "0:2:1", "value": 14}, {"name": "2:0:1", "value": 12}, {"name": "0:0:3", "value": 2}, {"name": "1:0:2", "value": 10}, {"name": "1:1:1", "value": 27}, {"name": "3:0:0", "value": 3}, {"name": "0:1:2", "value": 9}, {"name": "0:3:0", "value": 2}] }]
-});
-
-window.addEventListener('resize', function() {
-    missBai.resize(); missShi.resize(); missGe.resize();
-    sumTrend.resize(); spanTrend.resize();
-    sumDist.resize(); spanDist.resize(); tailDist.resize();
-    oeDist.resize(); bsDist.resize(); r012Dist.resize();
-});
 </script>
 </body>
 </html>
