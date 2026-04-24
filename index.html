@@ -787,12 +787,10 @@ function copyResults() {
 }
 
 function exportCSV() {
-  let csv = '号码,类型,跨度,和值
-';
+  let csv = '号码,类型,跨度,和值\n';
   currentNumbers.forEach(n => {
     const t = n.type==='z6'?'组六':n.type==='z3'?'组三':'豹子';
-    csv += `${n.num},${t},${n.span},${n.sum}
-`;
+    csv += `${n.num},${t},${n.span},${n.sum}\n`;
   });
   const blob = new Blob(['\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
