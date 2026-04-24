@@ -83,6 +83,9 @@
       <button onclick="switchPanel('rulestats')" id="nav-rulestats" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📋</span> 规则统计
       </button>
+      <button onclick="switchPanel('handmark')" id="nav-handmark" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
+        <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">✏️</span> 手工标记
+      </button>
       <button onclick="switchPanel('3ddata')" id="nav-3ddata" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-3">
         <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">📊</span> 3D数据
       </button>
@@ -527,6 +530,71 @@
       </div>
     </div>
 
+    <!-- 模块9: 手工标记 -->
+    <div id="panel-handmark" class="panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">手工标记数据</h2>
+        <p class="text-slate-400 mt-1">93期手写开奖记录与标记分析（26058~26150）</p>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">手写期数</div>
+          <div class="text-2xl font-bold text-white num-badge">93</div>
+          <div class="tag tag-blue mt-2">26058~26150</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">带标记期数</div>
+          <div class="text-2xl font-bold text-purple-400 num-badge">24</div>
+          <div class="tag tag-purple mt-2">25.8%</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">胆码标记命中</div>
+          <div class="text-2xl font-bold text-green-400 num-badge">100%</div>
+          <div class="tag tag-green mt-2">1期命中</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-4">
+          <div class="text-slate-400 text-xs mb-1">对码关系命中</div>
+          <div class="text-2xl font-bold text-yellow-400 num-badge">68%</div>
+          <div class="tag tag-orange mt-2">2-3期命中</div>
+        </div>
+      </div>
+
+      <!-- 手写数据表格 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-semibold text-slate-200">📋 手写开奖数据</h3>
+          <button onclick="exportHandData()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">导出CSV</button>
+        </div>
+        <div class="overflow-x-auto max-h-96 overflow-y-auto scroll-hide">
+          <table class="w-full text-sm">
+            <thead class="text-slate-500 text-xs sticky top-0 bg-slate-900">
+              <tr>
+                <th class="text-left py-2">期号</th>
+                <th class="text-center">开奖号</th>
+                <th class="text-center">类型</th>
+                <th class="text-center">和值</th>
+                <th class="text-center">跨度</th>
+                <th class="text-left">手写标记</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300" id="hand-data-table">
+              <!-- JS填充 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 标记分析 -->
+      <div class="glass rounded-xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">📊 标记类型分布</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="mark-stats">
+          <!-- JS填充 -->
+        </div>
+      </div>
+    </div>
+
     <!-- 模块8: 3D数据看板 -->
     <div id="panel-3ddata" class="panel">
       <div class="mb-6">
@@ -688,6 +756,75 @@ const RULE_STATS_806 = [{"id": 1, "name": "规则1: 百位=6 → 后两位∈{50
 
 // 每条规则最近10条触发记录
 const RULE_DETAILED_LIGHT = {"1": [{"trigger_period": "2026011", "trigger_num": "647", "next_nums": ["241", "513", "050"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026020", "trigger_num": "676", "next_nums": ["559", "678", "784"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026022", "trigger_num": "678", "next_nums": ["784", "911", "029"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026048", "trigger_num": "612", "next_nums": ["110", "689", "302"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026050", "trigger_num": "689", "next_nums": ["302", "277", "755"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026064", "trigger_num": "604", "next_nums": ["057", "934", "695"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026067", "trigger_num": "695", "next_nums": ["706", "908", "484"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026088", "trigger_num": "608", "next_nums": ["922", "816", "537"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026096", "trigger_num": "689", "next_nums": ["818", "513", "877"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026103", "trigger_num": "661", "next_nums": [], "hit_1": false, "hit_2": false, "hit_3": false}], "2": [{"trigger_period": "2025346", "trigger_num": "897", "next_nums": ["192", "278", "743"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026042", "trigger_num": "854", "next_nums": ["765", "589", "181"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026075", "trigger_num": "816", "next_nums": ["863", "112", "049"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026076", "trigger_num": "863", "next_nums": ["112", "049", "233"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026080", "trigger_num": "802", "next_nums": ["827", "942", "506"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026081", "trigger_num": "827", "next_nums": ["942", "506", "456"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026090", "trigger_num": "816", "next_nums": ["537", "870", "518"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026092", "trigger_num": "870", "next_nums": ["518", "418", "022"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026099", "trigger_num": "877", "next_nums": ["414", "584", "420"], "hit_1": false, "hit_2": true, "hit_3": true}], "3": [{"trigger_period": "2026017", "trigger_num": "945", "next_nums": ["494", "223", "676"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026024", "trigger_num": "911", "next_nums": ["029", "099", "126"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026041", "trigger_num": "901", "next_nums": ["854", "765", "589"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026047", "trigger_num": "936", "next_nums": ["612", "110", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026060", "trigger_num": "943", "next_nums": ["429", "294", "517"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026066", "trigger_num": "934", "next_nums": ["695", "706", "908"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026069", "trigger_num": "908", "next_nums": ["484", "261", "245"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026082", "trigger_num": "942", "next_nums": ["506", "456", "118"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026089", "trigger_num": "922", "next_nums": ["816", "537", "870"], "hit_1": false, "hit_2": false, "hit_3": false}], "4": [{"trigger_period": "2025303", "trigger_num": "933", "next_nums": ["471", "310", "697"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2025318", "trigger_num": "430", "next_nums": ["294", "121", "847"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2025340", "trigger_num": "130", "next_nums": ["996", "681", "645"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2025345", "trigger_num": "630", "next_nums": ["897", "192", "278"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026015", "trigger_num": "532", "next_nums": ["582", "945", "494"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026030", "trigger_num": "134", "next_nums": ["142", "452", "119"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026047", "trigger_num": "936", "next_nums": ["612", "110", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026066", "trigger_num": "934", "next_nums": ["695", "706", "908"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026079", "trigger_num": "233", "next_nums": ["802", "827", "942"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026091", "trigger_num": "537", "next_nums": ["870", "518", "418"], "hit_1": false, "hit_2": false, "hit_3": false}], "5": [{"trigger_period": "2026041", "trigger_num": "901", "next_nums": ["854", "765", "589"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026051", "trigger_num": "302", "next_nums": ["277", "755", "217"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026055", "trigger_num": "107", "next_nums": ["477", "264", "543"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026064", "trigger_num": "604", "next_nums": ["057", "934", "695"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026068", "trigger_num": "706", "next_nums": ["908", "484", "261"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026069", "trigger_num": "908", "next_nums": ["484", "261", "245"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026073", "trigger_num": "504", "next_nums": ["487", "816", "863"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026080", "trigger_num": "802", "next_nums": ["827", "942", "506"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026083", "trigger_num": "506", "next_nums": ["456", "118", "382"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026088", "trigger_num": "608", "next_nums": ["922", "816", "537"], "hit_1": true, "hit_2": true, "hit_3": true}], "6": [{"trigger_period": "2026077", "trigger_num": "112", "next_nums": ["049", "233", "802"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026079", "trigger_num": "233", "next_nums": ["802", "827", "942"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026085", "trigger_num": "118", "next_nums": ["382", "911", "608"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026089", "trigger_num": "922", "next_nums": ["816", "537", "870"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026095", "trigger_num": "022", "next_nums": ["689", "818", "513"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026099", "trigger_num": "877", "next_nums": ["414", "584", "420"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026100", "trigger_num": "414", "next_nums": ["584", "420", "661"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026103", "trigger_num": "661", "next_nums": [], "hit_1": false, "hit_2": false, "hit_3": false}], "7": [{"trigger_period": "2026075", "trigger_num": "816", "next_nums": ["863", "112", "049"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026077", "trigger_num": "112", "next_nums": ["049", "233", "802"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026085", "trigger_num": "118", "next_nums": ["382", "911", "608"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026087", "trigger_num": "911", "next_nums": ["608", "922", "816"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026090", "trigger_num": "816", "next_nums": ["537", "870", "518"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026093", "trigger_num": "518", "next_nums": ["418", "022", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026094", "trigger_num": "418", "next_nums": ["022", "689", "818"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026097", "trigger_num": "818", "next_nums": ["513", "877", "414"], "hit_1": false, "hit_2": true, "hit_3": true}, {"trigger_period": "2026098", "trigger_num": "513", "next_nums": ["877", "414", "584"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026100", "trigger_num": "414", "next_nums": ["584", "420", "661"], "hit_1": true, "hit_2": true, "hit_3": true}], "8": [{"trigger_period": "2025335", "trigger_num": "051", "next_nums": ["641", "876", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026004", "trigger_num": "019", "next_nums": ["476", "244", "353"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026014", "trigger_num": "050", "next_nums": ["532", "582", "945"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026025", "trigger_num": "029", "next_nums": ["099", "126", "270"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026026", "trigger_num": "099", "next_nums": ["126", "270", "003"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026029", "trigger_num": "003", "next_nums": ["134", "142", "452"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026034", "trigger_num": "052", "next_nums": ["213", "762", "420"], "hit_1": false, "hit_2": false, "hit_3": true}, {"trigger_period": "2026065", "trigger_num": "057", "next_nums": ["934", "695", "706"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026078", "trigger_num": "049", "next_nums": ["233", "802", "827"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026095", "trigger_num": "022", "next_nums": ["689", "818", "513"], "hit_1": false, "hit_2": false, "hit_3": true}], "9": [{"trigger_period": "2026021", "trigger_num": "559", "next_nums": ["678", "784", "911"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026044", "trigger_num": "589", "next_nums": ["181", "291", "936"], "hit_1": false, "hit_2": false, "hit_3": false}, {"trigger_period": "2026058", "trigger_num": "543", "next_nums": ["794", "943", "429"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026063", "trigger_num": "517", "next_nums": ["604", "057", "934"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026073", "trigger_num": "504", "next_nums": ["487", "816", "863"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026083", "trigger_num": "506", "next_nums": ["456", "118", "382"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026091", "trigger_num": "537", "next_nums": ["870", "518", "418"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026093", "trigger_num": "518", "next_nums": ["418", "022", "689"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026098", "trigger_num": "513", "next_nums": ["877", "414", "584"], "hit_1": true, "hit_2": true, "hit_3": true}, {"trigger_period": "2026101", "trigger_num": "584", "next_nums": ["420", "661"], "hit_1": true, "hit_2": true, "hit_3": true}]};
+
+
+// 手写标记数据（93期）
+const HANDWRITTEN_DATA = [{"period": "26058", "number": "661", "note": ""}, {"period": "26059", "number": "584", "note": ""}, {"period": "26060", "number": "414", "note": ""}, {"period": "26061", "number": "513", "note": ""}, {"period": "26062", "number": "818", "note": "百6后有50.51.53"}, {"period": "26063", "number": "689", "note": ""}, {"period": "26064", "number": "022", "note": "54=18"}, {"period": "26065", "number": "418", "note": ""}, {"period": "26066", "number": "518", "note": ""}, {"period": "26067", "number": "870", "note": ""}, {"period": "26068", "number": "816", "note": "92=3"}, {"period": "26069", "number": "922", "note": ""}, {"period": "26070", "number": "608", "note": "百6后有50.51.53"}, {"period": "26071", "number": "911", "note": ""}, {"period": "26072", "number": "382", "note": ""}, {"period": "26073", "number": "118", "note": "04=56"}, {"period": "26074", "number": "456", "note": ""}, {"period": "26075", "number": "506", "note": ""}, {"period": "26076", "number": "827", "note": ""}, {"period": "26077", "number": "802", "note": "833"}, {"period": "26078", "number": "233", "note": ""}, {"period": "26079", "number": "049", "note": ""}, {"period": "26080", "number": "112", "note": "13=68"}, {"period": "26081", "number": "863", "note": ""}, {"period": "26082", "number": "816", "note": ""}, {"period": "26083", "number": "487", "note": "20=45"}, {"period": "26084", "number": "504", "note": ""}, {"period": "26085", "number": "245", "note": ""}, {"period": "26086", "number": "261", "note": ""}, {"period": "26087", "number": "484", "note": "04=/"}, {"period": "26088", "number": "908", "note": "019胆"}, {"period": "26089", "number": "695", "note": ""}, {"period": "26090", "number": "934", "note": ""}, {"period": "26091", "number": "057", "note": "019胆"}, {"period": "26092", "number": "604", "note": ""}, {"period": "26093", "number": "517", "note": "22=49"}, {"period": "26094", "number": "294", "note": "23=49"}, {"period": "26095", "number": "429", "note": "73=94"}, {"period": "26096", "number": "943", "note": ""}, {"period": "26097", "number": "794", "note": "36=/"}, {"period": "26098", "number": "543", "note": ""}, {"period": "26099", "number": "477", "note": ""}, {"period": "26100", "number": "107", "note": ""}, {"period": "26101", "number": "217", "note": ""}, {"period": "26102", "number": "755", "note": ""}, {"period": "26103", "number": "277", "note": ""}, {"period": "26104", "number": "302", "note": ""}, {"period": "26105", "number": "689", "note": ""}, {"period": "26106", "number": "110", "note": ""}, {"period": "26107", "number": "612", "note": ""}, {"period": "26108", "number": "936", "note": ""}, {"period": "26109", "number": "291", "note": ""}, {"period": "26110", "number": "181", "note": ""}, {"period": "26111", "number": "589", "note": "46=/"}, {"period": "26112", "number": "765", "note": ""}, {"period": "26113", "number": "854", "note": ""}, {"period": "26114", "number": "901", "note": "20=45"}, {"period": "26115", "number": "425", "note": ""}, {"period": "26116", "number": "450", "note": ""}, {"period": "26117", "number": "467", "note": "60=/"}, {"period": "26118", "number": "420", "note": ""}, {"period": "26119", "number": "762", "note": ""}, {"period": "26120", "number": "213", "note": ""}, {"period": "26121", "number": "052", "note": ""}, {"period": "26122", "number": "119", "note": ""}, {"period": "26123", "number": "452", "note": "23=14"}, {"period": "26124", "number": "142", "note": ""}, {"period": "26125", "number": "134", "note": ""}, {"period": "26126", "number": "270", "note": ""}, {"period": "26127", "number": "126", "note": "2=09"}, {"period": "26128", "number": "099", "note": ""}, {"period": "26129", "number": "029", "note": ""}, {"period": "26130", "number": "911", "note": "64=78"}, {"period": "26131", "number": "784", "note": ""}, {"period": "26132", "number": "678", "note": ""}, {"period": "26133", "number": "559", "note": ""}, {"period": "26134", "number": "676", "note": ""}, {"period": "26135", "number": "494", "note": ""}, {"period": "26136", "number": "582", "note": ""}, {"period": "26137", "number": "532", "note": ""}, {"period": "26138", "number": "050", "note": "43=/"}, {"period": "26139", "number": "513", "note": ""}, {"period": "26140", "number": "241", "note": ""}, {"period": "26141", "number": "647", "note": ""}, {"period": "26142", "number": "667", "note": "6=25"}, {"period": "26143", "number": "265", "note": ""}, {"period": "26144", "number": "252", "note": ""}, {"period": "26145", "number": "353", "note": ""}, {"period": "26146", "number": "244", "note": ""}, {"period": "26147", "number": "019", "note": "12=/,"}, {"period": "26148", "number": "601", "note": ""}, {"period": "26149", "number": "520", "note": ""}, {"period": "26150", "number": "298", "note": ""}];
+
+// ==================== 手工标记面板 ====================
+
+function renderHandData() {
+  const tbody = document.getElementById('hand-data-table');
+  tbody.innerHTML = HANDWRITTEN_DATA.slice().reverse().map(d => {
+    const num = d.number;
+    const type = classify(num);
+    const typeLabel = type === 'z6' ? '组六' : type === 'z3' ? '组三' : '豹子';
+    const typeColor = type === 'z6' ? 'text-blue-400' : type === 'z3' ? 'text-purple-400' : 'text-orange-400';
+    const sum = sumValue(num);
+    const sp = span(num);
+    const noteClass = d.note ? 'text-yellow-400 font-bold' : 'text-slate-600';
+    return `<tr class="border-b border-slate-800 ${d.note ? 'bg-yellow-500/5' : ''}">
+      <td class="py-2 font-mono text-xs">${d.period}</td>
+      <td class="text-center font-bold text-white">${num}</td>
+      <td class="text-center ${typeColor} text-xs">${typeLabel}</td>
+      <td class="text-center text-slate-400">${sum}</td>
+      <td class="text-center text-slate-400">${sp}</td>
+      <td class="${noteClass} text-xs">${d.note || '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMarkStats() {
+  const container = document.getElementById('mark-stats');
+  const stats = {
+    '胆码': { count: 0, icon: '🎯', color: 'text-green-400', desc: '预测下期含特定数字' },
+    '对码/关系': { count: 0, icon: '🔗', color: 'text-yellow-400', desc: '对码映射与数字关系' },
+    '规则触发': { count: 0, icon: '⚡', color: 'text-blue-400', desc: '9条规则触发标记' },
+    '杀号': { count: 0, icon: '🚫', color: 'text-red-400', desc: '排除特定数字' },
+    '其他': { count: 0, icon: '📝', color: 'text-slate-400', desc: '其他手写标记' }
+  };
+  HANDWRITTEN_DATA.forEach(d => {
+    const note = d.note;
+    if (!note) return;
+    if (note.includes('胆')) stats['胆码'].count++;
+    else if (note.includes('杀') || note.startsWith('X')) stats['杀号'].count++;
+    else if (note.includes('百') || note.includes('后有') || note.includes('有')) stats['规则触发'].count++;
+    else if (note.includes('=') || note.includes('/')) stats['对码/关系'].count++;
+    else stats['其他'].count++;
+  });
+  container.innerHTML = Object.entries(stats).filter(([k, v]) => v.count > 0).map(([key, val]) => `
+    <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-lg">${val.icon}</span>
+        <span class="font-bold ${val.color}">${key}</span>
+        <span class="ml-auto text-2xl font-bold text-white">${val.count}</span>
+      </div>
+      <div class="text-xs text-slate-500">${val.desc}</div>
+    </div>
+  `).join('');
+}
+
+function exportHandData() {
+  let csv = '期号,开奖号,手写标记\n';
+  HANDWRITTEN_DATA.forEach(d => {
+    csv += `${d.period},${d.number},"${d.note || ''}"\n`;
+  });
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '手写标记数据.csv';
+  link.click();
+}
 
 
 function pad3(n) { return String(n).padStart(3, '0'); }
@@ -1927,6 +2064,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 初始化规则统计面板
   renderRuleStats();
   initRuleEditor();
+
+  // 初始化手工标记面板
+  renderHandData();
+  renderMarkStats();
 
   // 输入框回车触发
   document.getElementById('dan-input')?.addEventListener('keypress', e => { if(e.key==='Enter') predictDan(); });
